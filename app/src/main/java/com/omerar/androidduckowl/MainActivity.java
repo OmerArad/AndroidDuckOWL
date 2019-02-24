@@ -1,9 +1,13 @@
 package com.omerar.androidduckowl;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -25,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     final String publishMessage = "Hello World!";
     String localClientId;
     MqttConnectOptions mqttConnectOptions;
+    Boolean duckIsConnected = false;
 
 
     @Override
@@ -157,5 +162,23 @@ public class MainActivity extends AppCompatActivity {
     public void sendSOSAutomaticMessage(View view) {
         //TODO: Omer -> Work on this.
         Log.e(TAG, "Trying to send SOS MSG!");
+
+        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        if (info != null && info.isConnected()) {
+            String ssid = info.getExtraInfo();
+            Log.e(TAG, "WiFi SSID: " + ssid);
+            if (!ssid.contains("EMERGENCY")) {
+                Toast.makeText(getApplicationContext(), "Not connected to the correct Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
+                duckIsConnected = false;
+            } else {
+                duckIsConnected = true;
+                Log.e(TAG, "GREAT SUCCESS! CONNNECTED TO THE DUCK WIFI!");
+            }
+        } else if (info == null) {
+            Toast.makeText(getApplicationContext(), "Not connected to the Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
+            duckIsConnected = false;
+        }
+
     }
 }

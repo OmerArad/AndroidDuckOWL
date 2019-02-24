@@ -162,23 +162,11 @@ public class MainActivity extends AppCompatActivity {
     public void sendSOSAutomaticMessage(View view) {
         //TODO: Omer -> Work on this.
         Log.e(TAG, "Trying to send SOS MSG!");
-
-        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = cm.getActiveNetworkInfo();
-        if (info != null && info.isConnected()) {
-            String ssid = info.getExtraInfo();
-            Log.e(TAG, "WiFi SSID: " + ssid);
-            if (!ssid.contains("EMERGENCY")) {
-                Toast.makeText(getApplicationContext(), "Not connected to the correct Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
-                duckIsConnected = false;
-            } else {
-                duckIsConnected = true;
-                Log.e(TAG, "GREAT SUCCESS! CONNNECTED TO THE DUCK WIFI!");
-            }
-        } else if (info == null) {
-            Toast.makeText(getApplicationContext(), "Not connected to the Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
-            duckIsConnected = false;
+        boolean isConnected = Utils.isConnectedToDuckAP(getApplicationContext());
+        if (isConnected) {
+            //TODO: Do stuff!
         }
+
 
     }
 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AndroidDuckOWL</string>
+    <string name="send_sos_message">Send SOS Message!</string>
 </resources>

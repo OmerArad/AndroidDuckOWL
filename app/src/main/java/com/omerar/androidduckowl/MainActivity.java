@@ -3,6 +3,7 @@ package com.omerar.androidduckowl;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     String localClientId;
     MqttConnectOptions mqttConnectOptions;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,11 +34,50 @@ public class MainActivity extends AppCompatActivity {
 
         localClientId = Constants.getClientId() + System.currentTimeMillis();
 
-        mqttConnections();
+        //TODO: OMER -> define the MQTT as a service in the app so it would be accessible from all the activities!
+        initializeMQTT();
 
     }
 
-    void sendMQTT(MqttConnectOptions mqttConnectOptions) {
+    void initializeMQTT() {
+        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), Constants.getServerUri(), localClientId);
+        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+
+                if (reconnect) {
+                    Log.e(TAG,"Reconnected to : " + serverURI);
+                    // Because Clean Session is true, we need to re-subscribe
+                    subscribeToTopic();
+                } else {
+                    Log.e(TAG,"Connected to: " + serverURI);
+                }
+            }
+
+            @Override
+            public void connectionLost(Throwable cause) {
+                Log.e(TAG,"The Connection was lost.");
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                Log.e(TAG,"Incoming message: " + new String(message.getPayload()));
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+
+            }
+        });
+
+        mqttConnectOptions = new MqttConnectOptions();
+        mqttConnectOptions.setAutomaticReconnect(true);
+        mqttConnectOptions.setCleanSession(false);
+        connectMQTT(mqttConnectOptions);
+    }
+
+
+    void connectMQTT(MqttConnectOptions mqttConnectOptions) {
         try {
             Log.e(TAG,"Connecting to " + Constants.getServerUri());
             mqttAndroidClient.connect(mqttConnectOptions, getApplicationContext(), new IMqttActionListener() {
@@ -112,41 +153,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    
-    void mqttConnections() {
-        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), Constants.getServerUri(), localClientId);
-        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean reconnect, String serverURI) {
 
-                if (reconnect) {
-                    Log.e(TAG,"Reconnected to : " + serverURI);
-                    // Because Clean Session is true, we need to re-subscribe
-                    subscribeToTopic();
-                } else {
-                    Log.e(TAG,"Connected to: " + serverURI);
-                }
-            }
-
-            @Override
-            public void connectionLost(Throwable cause) {
-                Log.e(TAG,"The Connection was lost.");
-            }
-
-            @Override
-            public void messageArrived(String topic, MqttMessage message) throws Exception {
-                Log.e(TAG,"Incoming message: " + new String(message.getPayload()));
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken token) {
-
-            }
-        });
-
-        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setAutomaticReconnect(true);
-        mqttConnectOptions.setCleanSession(false);
-        sendMQTT(mqttConnectOptions);
+    public void sendSOSAutomaticMessage(View view) {
+        //TODO: Omer -> Work on this.
+        Log.e(TAG, "Trying to send SOS MSG!");
     }
 }

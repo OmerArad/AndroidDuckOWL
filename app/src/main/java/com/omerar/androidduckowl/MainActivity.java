@@ -17,13 +17,12 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class MainActivity extends AppCompatActivity {
     final String TAG = MainActivity.class.getSimpleName();
-    MqttAndroidClient mqttAndroidClient;
-    final String serverUri = "tcp://iot.eclipse.org:1883";
 
-    String clientId = "ExampleAndroidClient";
-    final String subscriptionTopic = "exampleAndroidTopic";
+    MqttAndroidClient mqttAndroidClient;
+
     final String publishTopic = "exampleAndroidPublishTopic";
     final String publishMessage = "Hello World!";
+    String localClientId;
     MqttConnectOptions mqttConnectOptions;
 
     @Override
@@ -31,19 +30,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        clientId = clientId + System.currentTimeMillis();
-        mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setAutomaticReconnect(true);
-        mqttConnectOptions.setCleanSession(false);
-        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), serverUri, clientId);
+        localClientId = Constants.getClientId() + System.currentTimeMillis();
 
-        sendMQTT(mqttConnectOptions);
+        mqttConnections();
 
     }
 
     void sendMQTT(MqttConnectOptions mqttConnectOptions) {
         try {
-            //Log.e(TAG,"Connecting to " + serverUri);
+            Log.e(TAG,"Connecting to " + Constants.getServerUri());
             mqttAndroidClient.connect(mqttConnectOptions, getApplicationContext(), new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
@@ -59,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.e(TAG,"Failed to connect to: " + serverUri);
+                    Log.e(TAG,"Failed to connect to: " + Constants.getServerUri());
                 }
             });
 
@@ -72,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void subscribeToTopic(){
         try {
-            mqttAndroidClient.subscribe(subscriptionTopic, 0, null, new IMqttActionListener() {
+            mqttAndroidClient.subscribe(Constants.getSubscriptionTopic(), 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.e(TAG,"Subscribed!");
@@ -87,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
             // THIS DOES NOT WORK!
-            mqttAndroidClient.subscribe(subscriptionTopic, 0, new IMqttMessageListener() {
+            mqttAndroidClient.subscribe(Constants.getSubscriptionTopic(), 0, new IMqttMessageListener() {
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                     // message Arrived!
@@ -119,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     
     void mqttConnections() {
-        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), serverUri, clientId);
+        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), Constants.getServerUri(), localClientId);
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
@@ -152,5 +147,6 @@ public class MainActivity extends AppCompatActivity {
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setAutomaticReconnect(true);
         mqttConnectOptions.setCleanSession(false);
+        sendMQTT(mqttConnectOptions);
     }
 }

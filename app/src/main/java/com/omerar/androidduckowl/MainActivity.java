@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -24,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     final String TAG = MainActivity.class.getSimpleName();
 
     MqttAndroidClient mqttAndroidClient;
+    Utils utils;
 
     final String publishTopic = "exampleAndroidPublishTopic";
     final String publishMessage = "Hello World!";
@@ -36,11 +39,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).
+                getRequestQueue();
 
         localClientId = Constants.getClientId() + System.currentTimeMillis();
 
+        utils = new Utils();
+
         //TODO: OMER -> define the MQTT as a service in the app so it would be accessible from all the activities!
-        initializeMQTT();
+//        initializeMQTT();
 
     }
 
@@ -162,9 +169,11 @@ public class MainActivity extends AppCompatActivity {
     public void sendSOSAutomaticMessage(View view) {
         //TODO: Omer -> Work on this.
         Log.e(TAG, "Trying to send SOS MSG!");
-        boolean isConnected = Utils.isConnectedToDuckAP(getApplicationContext());
+        boolean isConnected = utils.isConnectedToDuckAP(getApplicationContext());
         if (isConnected) {
             //TODO: Do stuff!
+            EmergencyRequest emergencyRequest = new EmergencyRequest("Test", "1111");
+            utils.sendGetRequest(getApplicationContext(),emergencyRequest);
         }
 
 

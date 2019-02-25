@@ -28,11 +28,12 @@ public class MainActivity extends AppCompatActivity {
     MqttAndroidClient mqttAndroidClient;
     Utils utils;
 
-    final String publishTopic = "exampleAndroidPublishTopic";
-    final String publishMessage = "Hello World!";
+    final String publishMessage = "{'msg' : 'Hello World Test!'}";
     String localClientId;
     MqttConnectOptions mqttConnectOptions;
     Boolean duckIsConnected = false;
+
+                            int counter = 0;
 
 
     @Override
@@ -47,12 +48,13 @@ public class MainActivity extends AppCompatActivity {
         utils = new Utils();
 
         //TODO: OMER -> define the MQTT as a service in the app so it would be accessible from all the activities!
-//        initializeMQTT();
+        initializeMQTT();
 
     }
 
     void initializeMQTT() {
-        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), Constants.getServerUri(), localClientId);
+        mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), Constants.getServerUri(), Constants.getClientId());
+
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 if (reconnect) {
                     Log.e(TAG,"Reconnected to : " + serverURI);
                     // Because Clean Session is true, we need to re-subscribe
-                    subscribeToTopic();
+//                    subscribeToTopic();
                 } else {
                     Log.e(TAG,"Connected to: " + serverURI);
                 }
@@ -84,8 +86,13 @@ public class MainActivity extends AppCompatActivity {
 
         mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setAutomaticReconnect(true);
-        mqttConnectOptions.setCleanSession(false);
+        mqttConnectOptions.setCleanSession(true);      //TODO: OMER -> SHOULD BE TRUE$@^$U@()TU!@(T!PT(J!PG$APODJGVPAOJDGPA(DJGAP(DGJDAPOG
+        mqttConnectOptions.setUserName(Constants.getIotDeviceUsername());
+        char[] password = Constants.getAuthToken().toCharArray();
+        mqttConnectOptions.setPassword(password);
         connectMQTT(mqttConnectOptions);
+
+
     }
 
 
@@ -102,12 +109,18 @@ public class MainActivity extends AppCompatActivity {
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
                     Log.e(TAG, " Great Success Connecting! :)");
-                    subscribeToTopic();
+//                    subscribeToTopic();
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     Log.e(TAG,"Failed to connect to: " + Constants.getServerUri());
+                    DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
+                    disconnectedBufferOptions.setBufferEnabled(true);
+                    disconnectedBufferOptions.setBufferSize(100);
+                    disconnectedBufferOptions.setPersistBuffer(false);
+                    disconnectedBufferOptions.setDeleteOldestMessages(false);
+                    mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
                 }
             });
 
@@ -119,18 +132,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void subscribeToTopic(){
+        //TODO: Currently not working!
         try {
-            mqttAndroidClient.subscribe(Constants.getSubscriptionTopic(), 0, null, new IMqttActionListener() {
+            mqttAndroidClient.subscribe(Constants.getSubscriptionTopic(), 1, getApplicationContext(), new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.e(TAG,"Subscribed!");
-                    publishMessage();   //TODO: OMER -> Remove from here.
+//                    publishMessage();   //TODO: OMER -> Remove from here.
 
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.e(TAG,"Failed to subscribe");
+                    Log.e(TAG,"Failed to subscribe: " + exception.toString());
                 }
             });
 
@@ -154,8 +168,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             MqttMessage message = new MqttMessage();
             message.setPayload(publishMessage.getBytes());
-            mqttAndroidClient.publish(publishTopic, message);
-            Log.e(TAG,"Message Published");
+            message.setQos(1);
+            mqttAndroidClient.publish(Constants.getSubscriptionTopic(), message);
+            Log.e(TAG, " Trying to publish: " + message);
             if(!mqttAndroidClient.isConnected()){
                 Log.e(TAG,mqttAndroidClient.getBufferedMessageCount() + " messages in buffer.");
             }
@@ -167,15 +182,27 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void sendSOSAutomaticMessage(View view) {
-        //TODO: Omer -> Work on this.
         Log.e(TAG, "Trying to send SOS MSG!");
         boolean isConnected = utils.isConnectedToDuckAP(getApplicationContext());
         if (isConnected) {
-            //TODO: Do stuff!
-            EmergencyRequest emergencyRequest = new EmergencyRequest("Test", "1111");
+            EmergencyRequest emergencyRequest = new EmergencyRequest("Test" + counter, "test" + counter);
             utils.sendGetRequest(getApplicationContext(),emergencyRequest);
+            counter++;
         }
 
 
+    }
+
+    public void sendManySOSMSGS(View view) {
+        Log.e(TAG, "Trying to send SOS MSG!");
+        boolean isConnected = utils.isConnectedToDuckAP(getApplicationContext());
+        if (isConnected) {
+            for (int i=0; i<10; i++) {
+                EmergencyRequest emergencyRequest = new EmergencyRequest("Test" + i, "test" + i);
+                utils.sendGetRequest(getApplicationContext(), emergencyRequest);
+            }
+        }
+
+        publishMessage();
     }
 }

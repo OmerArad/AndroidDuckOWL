@@ -1,6 +1,7 @@
 package com.omerar.androidduckowl;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class EmergencyRequest {
@@ -31,11 +32,24 @@ public class EmergencyRequest {
     }
 
     public HashMap getMap() {
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put("uuid",this.uuid);
+        LinkedHashMap<String, String> hashMap = new LinkedHashMap<>();
+        // The order here is important! LinkedHashMap will keep the order :)
+        /*
+            offline.fname      = webServer.arg(1);
+            offline.street     = webServer.arg(2);
+            offline.phone      = webServer.arg(3);
+            offline.occupants  = webServer.arg(4);
+            offline.danger     = webServer.arg(5);
+            offline.vacant     = webServer.arg(6);
+            offline.firstaid   = webServer.arg(7);
+            offline.water      = webServer.arg(8);
+            offline.food       = webServer.arg(9);
+            offline.msg        = webServer.arg(10);
+         */
+        hashMap.put("uuid",this.uuid);  // this is being ignored by the device, it has to be unique! id = webserver.arg(0)
         hashMap.put("name",this.name);
-        hashMap.put("phone",this.phone);
         hashMap.put("street",this.street);
+        hashMap.put("phone",this.phone);
         hashMap.put("occupants",this.occupants);
         hashMap.put("danger",this.danger);
         hashMap.put("vacant",this.vacant);

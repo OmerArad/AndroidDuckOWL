@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         if (isConnected) {
 //            EmergencyRequest emergencyRequest = new EmergencyRequest("Test" + counter, "test" + counter);
             String counterSTR = String.valueOf(counter);
-            EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"Test" + counter, "test" + counter,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
+            EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"Test" + counter,  counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
             utils.sendGetRequest(getApplicationContext(),emergencyRequest);
             counter++;
         }

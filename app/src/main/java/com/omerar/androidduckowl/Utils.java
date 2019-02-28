@@ -48,7 +48,7 @@ public class Utils {
             @Override
             public void onResponse(String response) {
                 //HANDLE RESPONSE
-                Log.e(TAG, "Response == " + response);
+//                Log.e(TAG, "Response == " + response);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -63,7 +63,7 @@ public class Utils {
                 // api and debug accordingly.
                 // For ServerError 5xx, you can do retry or handle
                 // accordingly.
-                Log.e(TAG, error.toString());
+//                Log.e(TAG, error.toString());
 
             }
         }) {

@@ -185,7 +185,9 @@ public class MainActivity extends AppCompatActivity {
         Log.e(TAG, "Trying to send SOS MSG!");
         boolean isConnected = utils.isConnectedToDuckAP(getApplicationContext());
         if (isConnected) {
-            EmergencyRequest emergencyRequest = new EmergencyRequest("Test" + counter, "test" + counter);
+//            EmergencyRequest emergencyRequest = new EmergencyRequest("Test" + counter, "test" + counter);
+            String counterSTR = String.valueOf(counter);
+            EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"Test" + counter, "test" + counter,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
             utils.sendGetRequest(getApplicationContext(),emergencyRequest);
             counter++;
         }

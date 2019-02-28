@@ -69,6 +69,7 @@ public class Utils {
         }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
+                //TODO: Need to sort the order of this HashMap!!!
                 HashMap<String, String> hashMap = emergencyRequest.getMap();
                 return hashMap;
             }
@@ -76,7 +77,7 @@ public class Utils {
         };
 
 
-        commonRequest.setRetryPolicy(new DefaultRetryPolicy(5000, 1, 2));
+//        commonRequest.setRetryPolicy(new DefaultRetryPolicy(5000, 1, 2));
         MySingleton.getInstance(context).addToRequestQueue(commonRequest);
 
 

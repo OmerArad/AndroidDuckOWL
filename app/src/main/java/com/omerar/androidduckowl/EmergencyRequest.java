@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EmergencyRequest {
+    private String uuid = "";
     private String name = "";
     private String phone = "";
     private String street = "";
@@ -15,7 +16,8 @@ public class EmergencyRequest {
     private String food = "";
     private String message = "";
 
-    public EmergencyRequest(String name, String phone, String street, String occupants, String danger, String vacant, String firstaid, String water, String food, String message) {
+    public EmergencyRequest(String uuid, String name, String phone, String street, String occupants, String danger, String vacant, String firstaid, String water, String food, String message) {
+        this.uuid = uuid;
         this.name = name;
         this.phone = phone;
         this.street = street;
@@ -30,16 +32,17 @@ public class EmergencyRequest {
 
     public HashMap getMap() {
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put("name","test");
-        hashMap.put("phone","11111");
-        hashMap.put("street","11111");
-        hashMap.put("occupants","1");
-        hashMap.put("danger","0");
-        hashMap.put("vacant","0");
-        hashMap.put("firstaid","0");
-        hashMap.put("water","0");
-        hashMap.put("food","0");
-        hashMap.put("message","test");
+        hashMap.put("uuid",this.uuid);
+        hashMap.put("name",this.name);
+        hashMap.put("phone",this.phone);
+        hashMap.put("street",this.street);
+        hashMap.put("occupants",this.occupants);
+        hashMap.put("danger",this.danger);
+        hashMap.put("vacant",this.vacant);
+        hashMap.put("firstaid",this.firstaid);
+        hashMap.put("water",this.water);
+        hashMap.put("food",this.food);
+        hashMap.put("message",this.message);
 
         return hashMap;
     }

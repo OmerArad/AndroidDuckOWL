@@ -185,9 +185,10 @@ public class MainActivity extends AppCompatActivity {
         Log.e(TAG, "Trying to send SOS MSG!");
         boolean isConnected = utils.isConnectedToDuckAP(getApplicationContext());
         if (isConnected) {
-//            EmergencyRequest emergencyRequest = new EmergencyRequest("Test" + counter, "test" + counter);
             String counterSTR = String.valueOf(counter);
-            EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"Test" + counter,  counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
+            EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"User" + counter,
+                                   counterSTR,counterSTR,counterSTR,counterSTR,
+                                    counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
             utils.sendGetRequest(getApplicationContext(),emergencyRequest);
             counter++;
         }
@@ -200,8 +201,12 @@ public class MainActivity extends AppCompatActivity {
         boolean isConnected = utils.isConnectedToDuckAP(getApplicationContext());
         if (isConnected) {
             for (int i=0; i<10; i++) {
-                EmergencyRequest emergencyRequest = new EmergencyRequest("Test" + i, "test" + i);
+                String counterSTR = String.valueOf(counter);
+                EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"User" + counter,
+                        counterSTR,counterSTR,counterSTR,counterSTR,
+                        counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
                 utils.sendGetRequest(getApplicationContext(), emergencyRequest);
+                counter++;
             }
         }
 

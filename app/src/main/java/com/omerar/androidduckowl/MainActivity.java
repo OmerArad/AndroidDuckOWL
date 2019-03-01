@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
+import com.google.gson.Gson;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -48,10 +49,6 @@ public class MainActivity extends AppCompatActivity {
     MqttAndroidClient mqttAndroidClient;
     Utils utils;
     BroadcastReceiver mNetworkReceiver;
-
-
-    final String publishMessage = "{'msg' : 'Hello World Test!'}";      //TODO: Change!
-
 
     String localClientId;
     MqttConnectOptions mqttConnectOptions;
@@ -121,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 // Called when a new location is found by the network location provider.
 //                makeUseOfNewLocation(location);
                 lastKnownLocation = location;
-                Log.e(TAG, "Location == " + location.toString());
+                Log.d(TAG, "Location == " + location.toString());
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -177,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
         mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setAutomaticReconnect(true);
-        mqttConnectOptions.setCleanSession(true);      //TODO: OMER -> SHOULD BE TRUE$@^$U@()TU!@(T!PT(J!PG$APODJGVPAOJDGPA(DJGAP(DGJDAPOG
+        mqttConnectOptions.setCleanSession(true);
         mqttConnectOptions.setUserName(Constants.getIotDeviceUsername());
         char[] password = Constants.getAuthToken().toCharArray();
         mqttConnectOptions.setPassword(password);
@@ -254,11 +251,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void publishMessage(){
+    public void publishMessage(EmergencyRequest emergencyRequest){
 
         try {
             MqttMessage message = new MqttMessage();
-            message.setPayload(publishMessage.getBytes());
+            Gson gson = new Gson();
+            String json = gson.toJson(emergencyRequest);
+            message.setPayload(json.getBytes());
             message.setQos(1);
             mqttAndroidClient.publish(Constants.getSubscriptionTopic(), message);
             Log.e(TAG, " Trying to publish: " + message);
@@ -280,8 +279,10 @@ public class MainActivity extends AppCompatActivity {
             EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"User" + counter,
                                    counterSTR,counterSTR,counterSTR,counterSTR,
                                     counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
+            emergencyRequest.setGpsLocation(lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude());
             utils.sendGetRequest(getApplicationContext(),emergencyRequest);
             counter++;
+            publishMessage(emergencyRequest);
         }
 
 
@@ -296,12 +297,12 @@ public class MainActivity extends AppCompatActivity {
                 EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"User" + counter,
                         counterSTR,counterSTR,counterSTR,counterSTR,
                         counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
+                emergencyRequest.setGpsLocation(lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude());
                 utils.sendGetRequest(getApplicationContext(), emergencyRequest);
                 counter++;
+                publishMessage(emergencyRequest);
             }
         }
-
-        publishMessage();
     }
 
 

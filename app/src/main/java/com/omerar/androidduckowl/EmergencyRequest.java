@@ -17,6 +17,9 @@ public class EmergencyRequest {
     private String food = "";
     private String message = "";
 
+
+    private String gpsLocation = "";
+
     public EmergencyRequest(String uuid, String name, String phone, String street, String occupants, String danger, String vacant, String firstaid, String water, String food, String message) {
         this.uuid = uuid;
         this.name = name;
@@ -145,5 +148,10 @@ public class EmergencyRequest {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+
+    public void setGpsLocation(String gpsLocation) {
+        this.gpsLocation = gpsLocation;
     }
 }

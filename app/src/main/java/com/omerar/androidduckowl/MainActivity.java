@@ -1,12 +1,26 @@
 package com.omerar.androidduckowl;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -22,34 +36,114 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.security.Permissions;
+
 public class MainActivity extends AppCompatActivity {
     final String TAG = MainActivity.class.getSimpleName();
 
     MqttAndroidClient mqttAndroidClient;
     Utils utils;
+    BroadcastReceiver mNetworkReceiver;
 
-    final String publishMessage = "{'msg' : 'Hello World Test!'}";
+
+    final String publishMessage = "{'msg' : 'Hello World Test!'}";      //TODO: Change!
     String localClientId;
     MqttConnectOptions mqttConnectOptions;
     Boolean duckIsConnected = false;
 
-                            int counter = 0;
+    int counter = 0;
+    Location lastKnownLocation;
+    TextView connectionTextView;
+    ImageView connectedImage;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        try
+        {
+            this.getSupportActionBar().hide();
+        }
+        catch (NullPointerException e){}
+
+        mNetworkReceiver = new NetworkBroadcastReciever();
+        registerReceiver(mNetworkReceiver,new IntentFilter(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION));
+        setContentView(R.layout.activity_main);
+
         RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).
                 getRequestQueue();
 
         localClientId = Constants.getClientId() + System.currentTimeMillis();
-
         utils = new Utils();
 
-        //TODO: OMER -> define the MQTT as a service in the app so it would be accessible from all the activities!
         initializeMQTT();
 
+        getLocation();
+
+        connectionTextView = findViewById(R.id.connection_status);
+        connectedImage = findViewById(R.id.connected_image);
+        checkConnectionStatus();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkConnectionStatus();
+    }
+
+    private void checkConnectionStatus() {
+        //TODO: Add listener when the wifi changes it should change automatically!
+        if (utils.isConnectedToDuckAP(getApplicationContext())) {
+            connectionTextView.setText(R.string.connected);
+            connectionTextView.setTextColor(Color.GREEN);
+            connectedImage.setImageDrawable(getResources().getDrawable(R.drawable.connected_duck));
+        } else {
+            connectionTextView.setText(R.string.disconnected);
+            connectionTextView.setTextColor(Color.RED);
+            connectedImage.setImageDrawable(getResources().getDrawable(R.drawable.disconnected_duck));
+        }
+    }
+
+    void getLocation() {
+        // Acquire a reference to the system Location Manager
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        // Define a listener that responds to location updates
+        LocationListener locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                // Called when a new location is found by the network location provider.
+//                makeUseOfNewLocation(location);
+                lastKnownLocation = location;
+                Log.e(TAG, "Location == " + location.toString());
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            public void onProviderEnabled(String provider) {
+            }
+
+            public void onProviderDisabled(String provider) {
+            }
+        };
+
+
+// Register the listener with the Location Manager to receive location updates
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+
+            //TODO: OMER -> Not working!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            Log.e(TAG, "PROBLEM GPS!");
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
     }
 
     void initializeMQTT() {
@@ -138,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.e(TAG,"Subscribed!");
-//                    publishMessage();   //TODO: OMER -> Remove from here.
+//                    publishMessage();   //TODO: Send a connected msg!
 
                 }
 
@@ -211,5 +305,42 @@ public class MainActivity extends AppCompatActivity {
         }
 
         publishMessage();
+    }
+
+
+    public class NetworkBroadcastReciever extends BroadcastReceiver
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            try
+            {
+                if (isOnline(context)) {
+                    checkConnectionStatus();
+                } else {
+                    checkConnectionStatus();
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private boolean isOnline(Context context) {
+            try {
+                ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo netInfo = cm.getActiveNetworkInfo();
+                //should check null because in airplane mode it will be null
+                return (netInfo != null && netInfo.isConnected());
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(mNetworkReceiver);
     }
 }

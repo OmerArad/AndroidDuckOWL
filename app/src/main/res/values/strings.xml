@@ -3,4 +3,6 @@
     <string name="send_sos_message">Send SOS Message!</string>
     <string name="send_10_msgs">Send 10 SOS Messages!</string>
     <string name="duck">Duck</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="connected">Connected to a Duck!</string>
 </resources>

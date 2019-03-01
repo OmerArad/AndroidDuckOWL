@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     final String publishMessage = "{'msg' : 'Hello World Test!'}";      //TODO: Change!
+
+
     String localClientId;
     MqttConnectOptions mqttConnectOptions;
     Boolean duckIsConnected = false;
@@ -67,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         }
         catch (NullPointerException e){}
 
-        mNetworkReceiver = new NetworkBroadcastReciever();
+        mNetworkReceiver = new NetworkBroadcastReceiver();
         registerReceiver(mNetworkReceiver,new IntentFilter(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION));
         setContentView(R.layout.activity_main);
 
@@ -308,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public class NetworkBroadcastReciever extends BroadcastReceiver
+    public class NetworkBroadcastReceiver extends BroadcastReceiver
     {
         @Override
         public void onReceive(Context context, Intent intent)

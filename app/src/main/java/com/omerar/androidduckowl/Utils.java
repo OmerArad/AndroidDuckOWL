@@ -69,7 +69,6 @@ public class Utils {
         }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                //TODO: Need to sort the order of this HashMap!!!
                 HashMap<String, String> hashMap = emergencyRequest.getMap();
                 return hashMap;
             }

@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkConnectionStatus() {
-        //TODO: Add listener when the wifi changes it should change automatically!
         if (utils.isConnectedToDuckAP(getApplicationContext())) {
             connectionTextView.setText(R.string.connected);
             connectionTextView.setTextColor(Color.GREEN);

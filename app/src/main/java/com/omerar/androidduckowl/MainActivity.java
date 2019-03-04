@@ -197,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
                     Log.e(TAG, " Great Success Connecting! :)");
 //                    subscribeToTopic();
+//                    publishTestMessage();
                 }
 
                 @Override
@@ -226,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.e(TAG,"Subscribed!");
 //                    publishMessage();   //TODO: Send a connected msg!
+
 
                 }
 
@@ -318,9 +320,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        unregisterReceiver(mNetworkReceiver);
+//    }
+
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         unregisterReceiver(mNetworkReceiver);
     }
 
@@ -393,6 +401,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+    void publishTestMessage() {
+        String counterSTR = "99";
+        EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"User" + counter,
+                counterSTR,counterSTR,counterSTR,counterSTR,
+                counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
+        publishMessage(emergencyRequest);
     }
 
 }

@@ -27,6 +27,10 @@ public class Utils {
         if (info != null && info.isConnected()) {
             String ssid = info.getExtraInfo();
             Log.e(TAG, "WiFi SSID: " + ssid);
+            if (ssid == null) {
+                Toast.makeText(context, "Not connected to the correct Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
+                return false;
+            }
             if (!ssid.contains("EMERGENCY")) {
                 Toast.makeText(context, "Not connected to the correct Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
                 return false;

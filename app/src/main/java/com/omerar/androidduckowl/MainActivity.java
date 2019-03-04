@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
                     Log.e(TAG, " Great Success Connecting! :)");
 //                    subscribeToTopic();
-//                    publishTestMessage();
+                    publishTestMessage();
                 }
 
                 @Override
@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
             mqttAndroidClient.publish(Constants.getSubscriptionTopic(), message);
             Log.e(TAG, " Trying to publish: " + message);
             if(!mqttAndroidClient.isConnected()){
-                Log.e(TAG,mqttAndroidClient.getBufferedMessageCount() + " messages in buffer.");
+//                Log.e(TAG,mqttAndroidClient.getBufferedMessageCount() + " messages in buffer.");
             }
         } catch (MqttException e) {
             System.err.println("Error Publishing: " + e.getMessage());
@@ -280,6 +280,9 @@ public class MainActivity extends AppCompatActivity {
             EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"User" + counter,
                                    counterSTR,counterSTR,counterSTR,counterSTR,
                                     counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
+            if (lastKnownLocation == null) {
+                Log.e(TAG, "GPS ERROR@");
+            }
             emergencyRequest.setGpsLocation(lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude());
             utils.sendGetRequest(getApplicationContext(),emergencyRequest);
             counter++;

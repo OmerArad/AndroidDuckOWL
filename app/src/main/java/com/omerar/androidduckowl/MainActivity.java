@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     Location lastKnownLocation;
     TextView connectionTextView;
     ImageView connectedImage;
+    TextView msgDebug;
 
 
     @Override
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
         connectionTextView = findViewById(R.id.connection_status);
         connectedImage = findViewById(R.id.connected_image);
+        msgDebug = findViewById(R.id.msg_debug);
         checkConnectionStatus();
     }
 
@@ -283,8 +285,15 @@ public class MainActivity extends AppCompatActivity {
             if (lastKnownLocation == null) {
                 Log.e(TAG, "GPS ERROR@");
             }
+            if (lastKnownLocation == null) {
+                Location loc = new Location("dummyprovider");
+                loc.setLatitude(0);
+                loc.setLongitude(0);
+                lastKnownLocation = loc;
+            }
             emergencyRequest.setGpsLocation(lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude());
             utils.sendGetRequest(getApplicationContext(),emergencyRequest);
+            msgDebug.setText("Sent Emergency Request: " + counterSTR);
             counter++;
             publishMessage(emergencyRequest);
         }
@@ -303,6 +312,7 @@ public class MainActivity extends AppCompatActivity {
                         counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
                 emergencyRequest.setGpsLocation(lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude());
                 utils.sendGetRequest(getApplicationContext(), emergencyRequest);
+                msgDebug.setText("Sent Emergency Request: " + counterSTR);
                 counter++;
                 publishMessage(emergencyRequest);
             }

@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
     String localClientId;
     MqttConnectOptions mqttConnectOptions;
-    Boolean duckIsConnected = false;
+
 
     int counter = 0;
     Location lastKnownLocation;

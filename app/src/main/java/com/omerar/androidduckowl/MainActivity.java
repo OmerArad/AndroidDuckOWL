@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
                     Log.e(TAG, " Great Success Connecting! :)");
 //                    subscribeToTopic();
-                    publishTestMessage();
+//                    publishTestMessage();     //Debug only.
                 }
 
                 @Override

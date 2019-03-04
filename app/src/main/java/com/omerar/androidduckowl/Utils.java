@@ -3,6 +3,8 @@ package com.omerar.androidduckowl;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -24,8 +26,16 @@ public class Utils {
     public boolean isConnectedToDuckAP(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
+
+
+
         if (info != null && info.isConnected()) {
-            String ssid = info.getExtraInfo();
+            WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            wifiInfo.getSSID();
+            String name = info.getExtraInfo();
+            String ssid = wifiInfo.getSSID();
+
             Log.e(TAG, "WiFi SSID: " + ssid);
             if (ssid == null) {
                 Toast.makeText(context, "Not connected to the correct Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();

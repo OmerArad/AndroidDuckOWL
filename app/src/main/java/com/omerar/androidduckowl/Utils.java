@@ -3,6 +3,7 @@ package com.omerar.androidduckowl;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -18,6 +19,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Utils {
@@ -55,7 +57,7 @@ public class Utils {
     }
 
 
-    public void sendGetRequest(Context context, final EmergencyRequest emergencyRequest) {
+    public void sendGetRequest(final Context context, final EmergencyRequest emergencyRequest) {
         String url = Constants.getDuck_AP_IP();
 
         StringRequest commonRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -63,6 +65,9 @@ public class Utils {
             public void onResponse(String response) {
                 //HANDLE RESPONSE
 //                Log.e(TAG, "Response == " + response);
+                if (response.contains("EMERGENCY")) {
+                    Toast.makeText(context,"MSG was sent successfully!",Toast.LENGTH_SHORT).show();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -78,6 +83,7 @@ public class Utils {
                 // For ServerError 5xx, you can do retry or handle
                 // accordingly.
 //                Log.e(TAG, error.toString());
+                Toast.makeText(context,"Please Put your phone on Airplane mode!", Toast.LENGTH_LONG).show();
 
             }
         }) {
@@ -95,6 +101,27 @@ public class Utils {
 
 
 
+    }
+
+    public void connectToDuckAP(Context context) {
+        String networkSSID = " 🆘 DUCK EMERGENCY PORTAL";
+
+
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = "\"" + networkSSID + "\"";   // Please note the quotes. String should contain ssid in quotes
+        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+        wifiManager.addNetwork(conf);
+        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+        for( WifiConfiguration i : list ) {
+            if(i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
+                wifiManager.disconnect();
+                wifiManager.enableNetwork(i.networkId, true);
+                wifiManager.reconnect();
+
+                break;
+            }
+        }
     }
 
 

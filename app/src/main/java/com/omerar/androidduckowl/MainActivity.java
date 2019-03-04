@@ -70,6 +70,11 @@ public class MainActivity extends AppCompatActivity {
             this.getSupportActionBar().hide();
         }
         catch (NullPointerException e){}
+        utils = new Utils();
+
+        utils.connectToDuckAP(getApplicationContext());
+
+
 
         mNetworkReceiver = new NetworkBroadcastReceiver();
         registerReceiver(mNetworkReceiver,new IntentFilter(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION));
@@ -79,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 getRequestQueue();
 
         localClientId = Constants.getClientId() + System.currentTimeMillis();
-        utils = new Utils();
+
 
         initializeMQTT();
 
@@ -293,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
             }
             emergencyRequest.setGpsLocation(lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude());
             utils.sendGetRequest(getApplicationContext(),emergencyRequest);
-            msgDebug.setText("Sent Emergency Request: " + counterSTR);
+            msgDebug.setText("Send Emergency Request ID: #" + counterSTR);
             counter++;
             publishMessage(emergencyRequest);
         }

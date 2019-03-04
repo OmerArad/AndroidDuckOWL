@@ -306,15 +306,7 @@ public class MainActivity extends AppCompatActivity {
         boolean isConnected = utils.isConnectedToDuckAP(getApplicationContext());
         if (isConnected) {
             for (int i=0; i<10; i++) {
-                String counterSTR = String.valueOf(counter);
-                EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"User" + counter,
-                        counterSTR,counterSTR,counterSTR,counterSTR,
-                        counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
-                emergencyRequest.setGpsLocation(lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude());
-                utils.sendGetRequest(getApplicationContext(), emergencyRequest);
-                msgDebug.setText("Sent Emergency Request: " + counterSTR);
-                counter++;
-                publishMessage(emergencyRequest);
+                sendSOSAutomaticMessage(view);
             }
         }
     }

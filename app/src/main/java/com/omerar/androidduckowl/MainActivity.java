@@ -247,11 +247,8 @@ public class MainActivity extends AppCompatActivity {
     public void subscribeToTopic(){
         //TODO: Currently not working!
         try {
-            //iot-2/cmd/command_id/fmt/format_string
-//            String subscriptionTopic = "iot-2/evt/androidDebug/fmt/json";
-            String subscriptionTopic = "iot-2/cmd/+/fmt/json";
-//            mqttAndroidClient.subscribe(Constants.getSubscriptionTopic(), 1, getApplicationContext(), new IMqttActionListener() {
-            mqttAndroidClient.subscribe(subscriptionTopic, 0, getApplicationContext(), new IMqttActionListener() {
+
+            mqttAndroidClient.subscribe(Constants.getSubscriptionTopic(), 0, getApplicationContext(), new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.e(TAG,"Subscribed!");
@@ -267,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
 //            // THIS DOES NOT WORK!
-            mqttAndroidClient.subscribe(subscriptionTopic, 0, new IMqttMessageListener() {
+            mqttAndroidClient.subscribe(Constants.getSubscriptionTopic(), 0, new IMqttMessageListener() {
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                     // message Arrived!
@@ -289,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
             String json = gson.toJson(emergencyRequest);
             message.setPayload(json.getBytes());
             message.setQos(1);
-            mqttAndroidClient.publish(Constants.getSubscriptionTopic(), message);
+            mqttAndroidClient.publish(Constants.getPublishTopic(), message);
             Log.e(TAG, " Trying to publish: " + message);
             if(!mqttAndroidClient.isConnected()){
 //                Log.e(TAG,mqttAndroidClient.getBufferedMessageCount() + " messages in buffer.");

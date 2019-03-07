@@ -10,7 +10,7 @@ public class Constants {
 //    private static final String authToken = "fC64mwjdLqqVFxquLk";
 //    private static final String deviceType  = "android2";
 //    private static final String IOT_DEVICE_USERNAME  = "use-token-auth";
-//    private static final String subscriptionTopic = "iot-2/evt/test/fmt/json";
+//    private static final String publishTopic = "iot-2/evt/test/fmt/json";
 //    private static final String clientID = "d:" + organization + ":" + deviceType + ":" + deviceID;
 
 
@@ -30,7 +30,10 @@ public class Constants {
 
 
     private static final String IOT_DEVICE_USERNAME  = "use-token-auth";
-    private static final String subscriptionTopic = "iot-2/evt/androidDebug/fmt/json";
+    private static final String publishTopic = "iot-2/evt/androidDebug/fmt/json";
+
+
+    private static final String subscriptionTopic = "iot-2/cmd/+/fmt/json";
     private static String clientID = "";
 //    Organization ID: zoad0c
 //    Device Type: android
@@ -53,8 +56,8 @@ public class Constants {
         String client = "d:" + organization + ":" + deviceType + ":" + deviceID;
         return client;
     }
-    public static String getSubscriptionTopic() {
-        return subscriptionTopic;
+    public static String getPublishTopic() {
+        return publishTopic;
     }
     public static String getDuck_AP_IP() {
         return duck_AP_IP;
@@ -93,5 +96,10 @@ public class Constants {
 
     public static String getOrganization() {
         return organization;
+    }
+
+
+    public static String getSubscriptionTopic() {
+        return subscriptionTopic;
     }
 }

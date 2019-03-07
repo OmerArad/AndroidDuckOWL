@@ -1,6 +1,8 @@
 package com.omerar.androidduckowl;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
@@ -15,9 +17,17 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.net.NetworkInterface;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +48,7 @@ public class Utils {
             String name = info.getExtraInfo();
             String ssid = wifiInfo.getSSID();
 
-            Log.e(TAG, "WiFi SSID: " + ssid);
+//            Log.e(TAG, "WiFi SSID: " + ssid);
             if (ssid == null) {
                 Toast.makeText(context, "Not connected to the correct Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
                 return false;
@@ -47,13 +57,20 @@ public class Utils {
                 Toast.makeText(context, "Not connected to the correct Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
                 return false;
             } else {
-                Log.e(TAG, "GREAT SUCCESS! CONNECTED TO THE DUCK WIFI!");
+//                Log.e(TAG, "GREAT SUCCESS! CONNECTED TO THE DUCK WIFI!");
                 return true;
             }
         } else if (info == null) {
             Toast.makeText(context, "Not connected to the Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
         }
         return false;
+    }
+
+    public boolean isConnectedToInternet(Context context) {
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+            return networkInfo != null && networkInfo.isConnected();
+
     }
 
 
@@ -94,13 +111,8 @@ public class Utils {
             }
 
         };
-
-
 //        commonRequest.setRetryPolicy(new DefaultRetryPolicy(5000, 1, 2));
         MySingleton.getInstance(context).addToRequestQueue(commonRequest);
-
-
-
     }
 
     public void connectToDuckAP(Context context) {
@@ -122,6 +134,132 @@ public class Utils {
                 break;
             }
         }
+    }
+
+    public void getIOTPCredentials(Context context) {
+        sendPOSTRequestTest(context);
+    }
+
+    private void sendPOSTRequestTest(final Context context) {
+        String url = "https://ducks-to-db.mybluemix.net/api/devices";
+//        String url = "http://192.168.1.161:3000/api/devices";
+
+        JSONObject jsonBodyObj = new JSONObject();
+
+        try{
+            String macAddress = getMACAddress();
+            if (macAddress.equals("")) {
+                macAddress = "0000000";
+                //TODO: Fix this issue!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            }
+            macAddress = macAddress.replace(":","");
+            jsonBodyObj.put("type", "android-duck");
+            jsonBodyObj.put("id", macAddress);
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        final String requestBody = jsonBodyObj.toString();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, null, new Response.Listener<JSONObject>(){
+            @Override    public void onResponse(JSONObject response) {
+                Log.e(TAG, String.valueOf(response));
+                try {
+                    SharedPreferences sharedPref = context.getSharedPreferences(
+                            context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+
+                    JSONObject credentials = (JSONObject) response.get("credentials");
+                    String authToken = credentials.get("token").toString();
+                    Constants.setAuthToken(authToken);
+                    editor.putString(context.getString(R.string.authToken), authToken);
+
+                    String deviceId = credentials.get("id").toString();
+                    Constants.setDeviceID(deviceId);
+                    editor.putString(context.getString(R.string.deviceID), deviceId);
+
+                    String deviceType = credentials.get("type").toString();
+                    Constants.setDeviceType(deviceType);
+                    editor.putString(context.getString(R.string.deviceType), deviceType);
+
+                    String organization = credentials.get("organization").toString();
+                    Constants.setOrganization(organization);
+                    editor.putString(context.getString(R.string.organization), organization);
+
+                    editor.putBoolean(context.getString(R.string.mqtt_credentials_set), Boolean.TRUE);
+
+                    editor.apply();
+                    Log.e(TAG, "Organziation=" + organization + " , deviceType=" + deviceType + " , deviceID=" + deviceId + " ,authToken=" + authToken);
+                    //TODO: OMER -> Send some broadcast msg here!
+                            Intent intent = new Intent();
+                            intent.setAction("MQTT_CREDENTIALS_RECIEVED");      //TODO: OMER -> Register something else!
+                            intent.putExtra("data","Notice me senpai!");
+                            context.sendBroadcast(intent);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, e.toString());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override    public void onErrorResponse(VolleyError error) {
+                if ((error != null) && (error.getMessage() != null)) {
+                    Log.e(TAG, error.getMessage());
+                }
+            }
+        }){
+            @Override    public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+
+
+            @Override    public byte[] getBody() {
+                try {
+                    return requestBody == null ? null : requestBody.getBytes("utf-8");
+                } catch (UnsupportedEncodingException uee) {
+                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s",
+                            requestBody, "utf-8");
+                    return null;
+                }
+            }
+
+
+        };
+                MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+
+    }
+
+    public String getMACAddress() {
+        String address = "";
+        try {
+            String interfaceName = "wlan0";
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                if (!intf.getName().equalsIgnoreCase(interfaceName)){
+                    continue;
+                }
+
+                byte[] mac = intf.getHardwareAddress();
+                if (mac==null){
+                    address = "";
+                }
+
+                StringBuilder buf = new StringBuilder();
+                for (byte aMac : mac) {
+                    buf.append(String.format("%02X:", aMac));
+                }
+                if (buf.length()>0) {
+                    buf.deleteCharAt(buf.length() - 1);
+                }
+                address = buf.toString();
+            }
+        } catch (Exception ex) { } // for now eat exceptions
+
+
+//        Log.e(TAG,"This device MAC address: " + address);
+        return address;
     }
 
 

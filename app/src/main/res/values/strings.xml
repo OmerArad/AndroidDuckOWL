@@ -3,7 +3,16 @@
     <string name="send_sos_message">Send SOS Message!</string>
     <string name="send_10_msgs">Send 10 SOS Messages!</string>
     <string name="duck">Duck</string>
-    <string name="disconnected">Disconnected</string>
-    <string name="connected">Connected to a Duck!</string>
+    <string name="duck_disconnected">Duck Disconnected</string>
+    <string name="mqtt_disconnected">MQTT Disconnected</string>
+    <string name="mqtt_connected">MQTT Connected</string>
+    <string name="duck_connected">Connected to a Duck!</string>
     <string name="messages_debug">Send a msg!</string>
+    <string name="preference_file_key">com.projectowl.app</string>
+    <string name="mqtt_credentials_set">mqtt_credentials_set</string>
+    <string name="organization">organization</string>
+    <string name="deviceID">deviceID</string>
+    <string name="authToken">authToken</string>
+    <string name="deviceType">deviceType</string>
+
 </resources>

@@ -6,15 +6,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -40,12 +38,13 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import java.security.Permissions;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     final String TAG = MainActivity.class.getSimpleName();
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
+    SharedPreferences sharedPref;
     MqttAndroidClient mqttAndroidClient;
     Utils utils;
     BroadcastReceiver mNetworkReceiver;
@@ -56,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
     int counter = 0;
     Location lastKnownLocation;
-    TextView connectionTextView;
+    TextView duckConnectionTextView;
+    TextView mqttConnectionTextView;
     ImageView connectedImage;
     TextView msgDebug;
 
@@ -71,13 +71,15 @@ public class MainActivity extends AppCompatActivity {
         }
         catch (NullPointerException e){}
         utils = new Utils();
+        Context context = getApplicationContext();
 
-        utils.connectToDuckAP(getApplicationContext());
-
+        sharedPref = context.getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
 
         mNetworkReceiver = new NetworkBroadcastReceiver();
         registerReceiver(mNetworkReceiver,new IntentFilter(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION));
+        registerReceiver(mNetworkReceiver,new IntentFilter("MQTT_CREDENTIALS_RECIEVED"));
         setContentView(R.layout.activity_main);
 
         RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).
@@ -85,32 +87,39 @@ public class MainActivity extends AppCompatActivity {
 
         localClientId = Constants.getClientId() + System.currentTimeMillis();
 
-
-        initializeMQTT();
-
         getLocation();
 
-        connectionTextView = findViewById(R.id.connection_status);
+        duckConnectionTextView = findViewById(R.id.duck_connection_status);
+        mqttConnectionTextView = findViewById(R.id.mqtt_connection_status);
         connectedImage = findViewById(R.id.connected_image);
         msgDebug = findViewById(R.id.msg_debug);
-        checkConnectionStatus();
+        checkDuckConnectionStatus();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        checkConnectionStatus();
+        checkDuckConnectionStatus();
     }
 
-    private void checkConnectionStatus() {
+    private void checkDuckConnectionStatus() {
         if (utils.isConnectedToDuckAP(getApplicationContext())) {
-            connectionTextView.setText(R.string.connected);
-            connectionTextView.setTextColor(Color.GREEN);
+            //TODO: OMER -> Check the edge case that it is connected to the duck and the mobile network!!!!!!!
+            duckConnectionTextView.setText(R.string.duck_connected);
+            duckConnectionTextView.setTextColor(Color.GREEN);
             connectedImage.setImageDrawable(getResources().getDrawable(R.drawable.connected_duck));
         } else {
-            connectionTextView.setText(R.string.disconnected);
-            connectionTextView.setTextColor(Color.RED);
+            duckConnectionTextView.setText(R.string.duck_disconnected);
+            duckConnectionTextView.setTextColor(Color.RED);
             connectedImage.setImageDrawable(getResources().getDrawable(R.drawable.disconnected_duck));
+        }
+
+        if ((mqttAndroidClient != null) && (mqttAndroidClient.isConnected())) {
+            mqttConnectionTextView.setText(R.string.mqtt_connected);
+            mqttConnectionTextView.setTextColor(Color.GREEN);
+        } else {
+            mqttConnectionTextView.setText(R.string.mqtt_disconnected);
+            mqttConnectionTextView.setTextColor(Color.RED);
         }
     }
 
@@ -139,7 +148,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 // Register the listener with the Location Manager to receive location updates
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             checkLocationPermission();
             return;
         }
@@ -157,14 +167,18 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG,"Reconnected to : " + serverURI);
                     // Because Clean Session is true, we need to re-subscribe
 //                    subscribeToTopic();
+                    checkDuckConnectionStatus();
                 } else {
                     Log.e(TAG,"Connected to: " + serverURI);
+                    Toast.makeText(getApplicationContext(),"MQTT Connected Successfuly!", Toast.LENGTH_SHORT).show();
+                    checkDuckConnectionStatus();
                 }
             }
 
             @Override
             public void connectionLost(Throwable cause) {
                 Log.e(TAG,"The Connection was lost.");
+                checkDuckConnectionStatus();
             }
 
             @Override
@@ -202,7 +216,9 @@ public class MainActivity extends AppCompatActivity {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-                    Log.e(TAG, " Great Success Connecting! :)");
+                    Log.e(TAG, " MQTT Connected Successfuly! :)");
+                    Toast.makeText(getApplicationContext(),"MQTT Connected Successfuly!", Toast.LENGTH_SHORT).show();
+                    checkDuckConnectionStatus();
 //                    subscribeToTopic();
 //                    publishTestMessage();     //Debug only.
                 }
@@ -216,6 +232,8 @@ public class MainActivity extends AppCompatActivity {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
+                    Toast.makeText(getApplicationContext(),"MQTT Connection Failed!", Toast.LENGTH_SHORT).show();
+                    checkDuckConnectionStatus();
                 }
             });
 
@@ -284,7 +302,9 @@ public class MainActivity extends AppCompatActivity {
         boolean isConnected = utils.isConnectedToDuckAP(getApplicationContext());
         if (isConnected) {
             String counterSTR = String.valueOf(counter);
-            EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"User" + counter,
+            String uniqueId = UUID.randomUUID().toString().substring(0,8);
+
+            EmergencyRequest emergencyRequest = new EmergencyRequest(uniqueId,  uniqueId,
                                    counterSTR,counterSTR,counterSTR,counterSTR,
                                     counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
             if (lastKnownLocation == null) {
@@ -323,18 +343,46 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent)
         {
             try {
-                checkConnectionStatus();
+                checkDuckConnectionStatus();
+
+                utils.getMACAddress();
+                Boolean mqtt_credentials_set = sharedPref.getBoolean(getString(R.string.mqtt_credentials_set), Boolean.FALSE);
+                if (utils.isConnectedToInternet(context)) {
+                    if ((intent.getAction() != null) && intent.getAction().equals("MQTT_CREDENTIALS_RECIEVED") && (mqttAndroidClient == null)) {
+                        // This case is where the API Call returned the MQTT credentials. Now it should
+                        // initialize the MQTT server and will connect to it.
+                        Log.d(TAG, "MQTT Credentials set");
+                        Log.e(TAG, "1");
+                        initializeMQTT();
+                        return;
+                    }
+                    if ((mqttAndroidClient == null) && (mqtt_credentials_set)) {
+                        // This case is the general case where the app already has the credentials stored
+                        // for it and will just try to connect to the MQTT server.
+                        Constants.setOrganization(sharedPref.getString(getString(R.string.organization), ""));
+                        Constants.setDeviceType(sharedPref.getString(getString(R.string.deviceType), ""));
+                        Constants.setDeviceID(sharedPref.getString(getString(R.string.deviceID), ""));
+                        Constants.setAuthToken(sharedPref.getString(getString(R.string.authToken), ""));
+                        Log.e(TAG, "2");
+                        initializeMQTT();
+                    } else {
+                        // This is the first time the app opens. Need to go to the API and ask for
+                        // the IOTP credentials for this specific Android device.
+                        utils.getIOTPCredentials(getApplicationContext());
+                    }
+                } else {
+                    // Not connected to the internet, try to connect to the duck!
+                    Log.e(TAG, "Not connected to the internet, trying to connect to the duck!");
+                    //        utils.connectToDuckAP(getApplicationContext());       //TODO: OMER -> Only now for debug. Return it later!
+                }
+
             } catch (NullPointerException e) {
                 e.printStackTrace();
             }
         }
     }
 
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        unregisterReceiver(mNetworkReceiver);
-//    }
+
 
     @Override
     protected void onDestroy() {

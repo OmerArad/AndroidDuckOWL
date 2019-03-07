@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                 if (reconnect) {
                     Log.e(TAG,"Reconnected to : " + serverURI);
                     // Because Clean Session is true, we need to re-subscribe
-//                    subscribeToTopic();
+                    subscribeToTopic();
                     checkDuckConnectionStatus();
                 } else {
                     Log.e(TAG,"Connected to: " + serverURI);
@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, " MQTT Connected Successfuly! :)");
                     Toast.makeText(getApplicationContext(),"MQTT Connected Successfuly!", Toast.LENGTH_SHORT).show();
                     checkDuckConnectionStatus();
-//                    subscribeToTopic();
+                    subscribeToTopic();
 //                    publishTestMessage();     //Debug only.
                 }
 
@@ -247,7 +247,11 @@ public class MainActivity extends AppCompatActivity {
     public void subscribeToTopic(){
         //TODO: Currently not working!
         try {
-            mqttAndroidClient.subscribe(Constants.getSubscriptionTopic(), 1, getApplicationContext(), new IMqttActionListener() {
+            //iot-2/cmd/command_id/fmt/format_string
+//            String subscriptionTopic = "iot-2/evt/androidDebug/fmt/json";
+            String subscriptionTopic = "iot-2/cmd/+/fmt/json";
+//            mqttAndroidClient.subscribe(Constants.getSubscriptionTopic(), 1, getApplicationContext(), new IMqttActionListener() {
+            mqttAndroidClient.subscribe(subscriptionTopic, 0, getApplicationContext(), new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.e(TAG,"Subscribed!");
@@ -262,12 +266,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            // THIS DOES NOT WORK!
-            mqttAndroidClient.subscribe(Constants.getSubscriptionTopic(), 0, new IMqttMessageListener() {
+//            // THIS DOES NOT WORK!
+            mqttAndroidClient.subscribe(subscriptionTopic, 0, new IMqttMessageListener() {
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                     // message Arrived!
-                    System.out.println("Message: " + topic + " : " + new String(message.getPayload()));
+                    Log.e(TAG, "Message: " + topic + " : " + new String(message.getPayload()));
                 }
             });
 
@@ -363,6 +367,9 @@ public class MainActivity extends AppCompatActivity {
                         Constants.setDeviceType(sharedPref.getString(getString(R.string.deviceType), ""));
                         Constants.setDeviceID(sharedPref.getString(getString(R.string.deviceID), ""));
                         Constants.setAuthToken(sharedPref.getString(getString(R.string.authToken), ""));
+                        Log.e(TAG, "Organziation=" + Constants.getOrganization() + " , deviceType=" + Constants.getDeviceType() +
+                                " , deviceID=" + Constants.getDeviceID() + " ,authToken=" + Constants.getAuthToken());
+
                         Log.e(TAG, "2");
                         initializeMQTT();
                     } else {

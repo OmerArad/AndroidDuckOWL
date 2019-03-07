@@ -153,7 +153,7 @@ public class Utils {
                 //TODO: Fix this issue!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
             macAddress = macAddress.replace(":","");
-            jsonBodyObj.put("type", "android-duck");
+            jsonBodyObj.put("type", "android");
             jsonBodyObj.put("id", macAddress);
         }catch (JSONException e){
             e.printStackTrace();

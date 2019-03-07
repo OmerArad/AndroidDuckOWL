@@ -20,6 +20,8 @@ public class Constants {
 //    private static  String authToken = "kU7sJww216BA+RZ)If";
 //    private static  String deviceType  = "android";
 
+
+
     private static String organization = "";
     private static String deviceID = "";
     private static String authToken = "";
@@ -89,4 +91,7 @@ public class Constants {
         Constants.deviceType = deviceType;
     }
 
+    public static String getOrganization() {
+        return organization;
+    }
 }

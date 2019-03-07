@@ -1,5 +1,8 @@
 package com.omerar.androidduckowl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Constants {
 
 
@@ -28,6 +31,8 @@ public class Constants {
     private static String deviceType  = "";
 
 
+
+    private static List<String> messageIDs = new ArrayList<>();
 
     private static final String IOT_DEVICE_USERNAME  = "use-token-auth";
     private static final String publishTopic = "iot-2/evt/androidDebug/fmt/json";
@@ -101,5 +106,17 @@ public class Constants {
 
     public static String getSubscriptionTopic() {
         return subscriptionTopic;
+    }
+
+    public static List<String> getMessageIDs() {
+        return messageIDs;
+    }
+
+    public static void setMessageIDs(List<String> messageIDs) {
+        Constants.messageIDs = messageIDs;
+    }
+
+    public static void addMessageID(String msgID) {
+        Constants.messageIDs.add(msgID);
     }
 }

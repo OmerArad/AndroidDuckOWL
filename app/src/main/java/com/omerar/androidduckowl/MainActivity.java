@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         utils = new Utils();
         Context context = getApplicationContext();
 
+
         sharedPref = context.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
@@ -166,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 if (reconnect) {
                     Log.e(TAG,"Reconnected to : " + serverURI);
                     // Because Clean Session is true, we need to re-subscribe
-                    subscribeToTopic();
+//                    subscribeToTopic();
                     checkDuckConnectionStatus();
                 } else {
                     Log.e(TAG,"Connected to: " + serverURI);
@@ -219,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, " MQTT Connected Successfuly! :)");
                     Toast.makeText(getApplicationContext(),"MQTT Connected Successfuly!", Toast.LENGTH_SHORT).show();
                     checkDuckConnectionStatus();
-                    subscribeToTopic();
+//                    subscribeToTopic();
 //                    publishTestMessage();     //Debug only.
                 }
 
@@ -299,7 +300,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void sendSOSAutomaticMessage(View view) {
-        Log.e(TAG, "Trying to send SOS MSG!");
         boolean isConnected = utils.isConnectedToDuckAP(getApplicationContext());
         if (isConnected) {
             String counterSTR = String.valueOf(counter);
@@ -319,9 +319,11 @@ public class MainActivity extends AppCompatActivity {
             }
             emergencyRequest.setGpsLocation(lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude());
             utils.sendGetRequest(getApplicationContext(),emergencyRequest);
-            msgDebug.setText("Send Emergency Request ID: #" + counterSTR);
+            msgDebug.setText("Send Emergency Request ID: " + uniqueId +  " , #" + counterSTR);
             counter++;
             publishMessage(emergencyRequest);
+            Log.e(TAG, "Trying to send SOS MSG!");
+            Constants.addMessageID(uniqueId);
         }
 
 
@@ -337,6 +339,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void checkDB(View view) {
+        utils.sendPOSTRequestMSGStatus(getApplicationContext());
+    }
+
+    public void tagDuck(View view) {
+       //TODO: OMER -> Copmlete this!!!!!!!!!!!
+        // Create an API call that will tag the location of the duck and the duck's MAC ADDRESS!
+    }
+
 
     public class NetworkBroadcastReceiver extends BroadcastReceiver
     {
@@ -348,37 +359,39 @@ public class MainActivity extends AppCompatActivity {
 
                 utils.getMACAddress();
                 Boolean mqtt_credentials_set = sharedPref.getBoolean(getString(R.string.mqtt_credentials_set), Boolean.FALSE);
-                if (utils.isConnectedToInternet(context)) {
                     if ((intent.getAction() != null) && intent.getAction().equals("MQTT_CREDENTIALS_RECIEVED") && (mqttAndroidClient == null)) {
+                        Log.e(TAG, "11111111111111");
                         // This case is where the API Call returned the MQTT credentials. Now it should
                         // initialize the MQTT server and will connect to it.
                         Log.d(TAG, "MQTT Credentials set");
-                        Log.e(TAG, "1");
                         initializeMQTT();
                         return;
                     }
                     if ((mqttAndroidClient == null) && (mqtt_credentials_set)) {
                         // This case is the general case where the app already has the credentials stored
                         // for it and will just try to connect to the MQTT server.
+                        Log.e(TAG, "22222222222222");
                         Constants.setOrganization(sharedPref.getString(getString(R.string.organization), ""));
                         Constants.setDeviceType(sharedPref.getString(getString(R.string.deviceType), ""));
                         Constants.setDeviceID(sharedPref.getString(getString(R.string.deviceID), ""));
                         Constants.setAuthToken(sharedPref.getString(getString(R.string.authToken), ""));
                         Log.e(TAG, "Organziation=" + Constants.getOrganization() + " , deviceType=" + Constants.getDeviceType() +
                                 " , deviceID=" + Constants.getDeviceID() + " ,authToken=" + Constants.getAuthToken());
-
-                        Log.e(TAG, "2");
                         initializeMQTT();
-                    } else {
+                    } else if (!mqtt_credentials_set){
+                        Log.e(TAG, "333333333333333");
                         // This is the first time the app opens. Need to go to the API and ask for
                         // the IOTP credentials for this specific Android device.
                         utils.getIOTPCredentials(getApplicationContext());
                     }
-                } else {
+
+                if (utils.isConnectedToDuckAP(context)) {
                     // Not connected to the internet, try to connect to the duck!
-                    Log.e(TAG, "Not connected to the internet, trying to connect to the duck!");
+//                    Log.e(TAG, "Not connected to the internet, trying to connect to the duck!");
                     //        utils.connectToDuckAP(getApplicationContext());       //TODO: OMER -> Only now for debug. Return it later!
                 }
+
+
 
             } catch (NullPointerException e) {
                 e.printStackTrace();

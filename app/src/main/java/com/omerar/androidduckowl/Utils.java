@@ -12,16 +12,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -67,10 +65,18 @@ public class Utils {
     }
 
     public boolean isConnectedToInternet(Context context) {
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-            return networkInfo != null && networkInfo.isConnected();
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
 
+        if (networkInfo != null && networkInfo.isConnected()) {
+            if (isConnectedToDuckAP(context)) {
+                return false;
+            } else {
+                return true;
+            }
+
+        }
+        return false;
     }
 
 
@@ -137,12 +143,11 @@ public class Utils {
     }
 
     public void getIOTPCredentials(Context context) {
-        sendPOSTRequestTest(context);
+        sendPOSTRequestCredentials(context);
     }
 
-    private void sendPOSTRequestTest(final Context context) {
+    private void sendPOSTRequestCredentials(final Context context) {
         String url = "https://ducks-to-db.mybluemix.net/api/devices";
-//        String url = "http://192.168.1.161:3000/api/devices";
 
         JSONObject jsonBodyObj = new JSONObject();
 
@@ -150,7 +155,6 @@ public class Utils {
             String macAddress = getMACAddress();
             if (macAddress.equals("")) {
                 macAddress = "0000000";
-                //TODO: Fix this issue!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
             macAddress = macAddress.replace(":","");
             jsonBodyObj.put("type", "android");
@@ -162,7 +166,8 @@ public class Utils {
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                 url, null, new Response.Listener<JSONObject>(){
-            @Override    public void onResponse(JSONObject response) {
+            @Override
+            public void onResponse(JSONObject response) {
                 Log.e(TAG, String.valueOf(response));
                 try {
                     SharedPreferences sharedPref = context.getSharedPreferences(
@@ -190,7 +195,6 @@ public class Utils {
 
                     editor.apply();
                     Log.e(TAG, "Organziation=" + organization + " , deviceType=" + deviceType + " , deviceID=" + deviceId + " ,authToken=" + authToken);
-                    //TODO: OMER -> Send some broadcast msg here!
                             Intent intent = new Intent();
                             intent.setAction("MQTT_CREDENTIALS_RECIEVED");      //TODO: OMER -> Register something else!
                             intent.putExtra("data","Notice me senpai!");
@@ -228,8 +232,74 @@ public class Utils {
 
         };
                 MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
+
+    public void sendPOSTRequestMSGStatus(final Context context) {
+        String url = "https://ducks-to-db.mybluemix.net/api/devices/message_status";
+
+        JSONObject jsonBodyObj = new JSONObject();
+
+        try{
+
+            JSONArray msgs = new JSONArray();
+            List<String> msgsList = Constants.getMessageIDs();
+            for (int i=0; i<msgsList.size(); i++) {
+                msgs.put(msgsList.get(i));
+            }
+
+            jsonBodyObj.put("message_ids", msgs);
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        final String requestBody = jsonBodyObj.toString();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, null, new Response.Listener<JSONObject>(){
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.e(TAG, String.valueOf(response));
+
+                Log.e(TAG, response.toString());
+                Toast.makeText(context, response.toString(),Toast.LENGTH_LONG).show();     //TODO: OMER -> Change this!
+
+//                    Intent intent = new Intent();
+//                    intent.setAction("MQTT_CREDENTIALS_RECIEVED");      //TODO: OMER -> Register something else!
+//                    intent.putExtra("data","Notice me senpai!");
+//                    context.sendBroadcast(intent);
+
+            }
+        }, new Response.ErrorListener() {
+            @Override    public void onErrorResponse(VolleyError error) {
+                if ((error != null) && (error.getMessage() != null)) {
+                    Log.e(TAG, error.getMessage());
+                }
+            }
+        }){
+            @Override    public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+
+
+            @Override    public byte[] getBody() {
+                try {
+                    return requestBody == null ? null : requestBody.getBytes("utf-8");
+                } catch (UnsupportedEncodingException uee) {
+                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s",
+                            requestBody, "utf-8");
+                    return null;
+                }
+            }
+
+
+        };
+        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
 
     }
+
+
 
     public String getMACAddress() {
         String address = "";

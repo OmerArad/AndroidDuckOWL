@@ -370,7 +370,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void tagDuck(View view) {
-       //TODO: OMER -> Copmlete this!!!!!!!!!!!
         // Create an API call that will tag the location of the duck and the duck's MAC ADDRESS!
         utils.sendGetRequestDuckMACAddress(getApplicationContext());
 

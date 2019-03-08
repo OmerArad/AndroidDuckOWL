@@ -198,8 +198,8 @@ public class Utils {
                     editor.apply();
                     Log.e(TAG, "Organziation=" + organization + " , deviceType=" + deviceType + " , deviceID=" + deviceId + " ,authToken=" + authToken);
                             Intent intent = new Intent();
-                            intent.setAction("MQTT_CREDENTIALS_RECIEVED");      //TODO: OMER -> Register something else!
-                            intent.putExtra("data","Notice me senpai!");
+                            intent.setAction("MQTT_CREDENTIALS_RECIEVED");
+//                            intent.putExtra("data","Notice me senpai!");
                             context.sendBroadcast(intent);
 
                 } catch (JSONException e) {
@@ -263,7 +263,7 @@ public class Utils {
                 Log.e(TAG, String.valueOf(response));
 
                 Log.e(TAG, response.toString());
-//                Toast.makeText(context, response.toString(),Toast.LENGTH_LONG).show();     //TODO: OMER -> Change this!
+//                Toast.makeText(context, response.toString(),Toast.LENGTH_LONG).show();
 
                     Intent intent = new Intent(context, ResultsActivity.class);
                     intent.putExtra("TEST", response.toString());
@@ -346,8 +346,8 @@ public class Utils {
                 if (response != null) {
                     Constants.setDuckMacAddress(response);
                     Intent intent = new Intent();
-                    intent.setAction("DUCK_MACADRESS_UPDATED");      //TODO: OMER -> Register something else!
-                    intent.putExtra("data","Notice me senpai!");
+                    intent.setAction("DUCK_MACADRESS_UPDATED");
+//                    intent.putExtra("data","Notice me senpai!");
                     context.sendBroadcast(intent);
                 }
             }

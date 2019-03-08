@@ -20,6 +20,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     TextView mqttConnectionTextView;
     ImageView connectedImage;
     TextView msgDebug;
+    Button checkDBBUtton;
 
 
     @Override
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         catch (NullPointerException e){}
         utils = new Utils();
         Context context = getApplicationContext();
+        checkDBBUtton = findViewById(R.id.checkDB);
 
 
         sharedPref = context.getSharedPreferences(
@@ -81,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         mNetworkReceiver = new NetworkBroadcastReceiver();
         registerReceiver(mNetworkReceiver,new IntentFilter(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION));
         registerReceiver(mNetworkReceiver,new IntentFilter("MQTT_CREDENTIALS_RECIEVED"));
+        registerReceiver(mNetworkReceiver,new IntentFilter("DUCK_MACADRESS_UPDATED"));
         setContentView(R.layout.activity_main);
 
         RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).
@@ -298,6 +302,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void publishDuckObservation(DuckObservation duckObservation){
+
+        try {
+            MqttMessage message = new MqttMessage();
+            Gson gson = new Gson();
+            String json = gson.toJson(duckObservation);
+            message.setPayload(json.getBytes());
+            message.setQos(1);
+            mqttAndroidClient.publish(Constants.getPublishTopic(), message);
+            Log.e(TAG, " Trying to publish Duck Observation: " + message);
+            if(!mqttAndroidClient.isConnected()){
+//                Log.e(TAG,mqttAndroidClient.getBufferedMessageCount() + " messages in buffer.");
+            }
+        } catch (MqttException e) {
+            System.err.println("Error Publishing: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     public void sendSOSAutomaticMessage(View view) {
         boolean isConnected = utils.isConnectedToDuckAP(getApplicationContext());
@@ -347,6 +370,8 @@ public class MainActivity extends AppCompatActivity {
     public void tagDuck(View view) {
        //TODO: OMER -> Copmlete this!!!!!!!!!!!
         // Create an API call that will tag the location of the duck and the duck's MAC ADDRESS!
+        utils.sendGetRequestDuckMACAddress(getApplicationContext());
+
     }
 
 
@@ -368,6 +393,24 @@ public class MainActivity extends AppCompatActivity {
                         initializeMQTT();
                         return;
                     }
+                if ((intent.getAction() != null) && intent.getAction().equals("DUCK_MACADRESS_UPDATED") && (mqttAndroidClient != null)) {
+                    Log.e(TAG, "33333333333");
+                    // This case is when we tagged a duck and we want to send the phone's GPS coordinates
+                    // With the duck's Mac Address to the db.
+                    msgDebug.setText("Duck MacAddress == " + Constants.getDuckMacAddress());
+                    DuckObservation duckObservation = new DuckObservation();
+                    duckObservation.setDeviceId(Constants.getDuckMacAddress());
+                    duckObservation.setDeviceType("ducklink");
+                    double latitude = lastKnownLocation.getLatitude();
+                    double longitude = lastKnownLocation.getLongitude();
+                    duckObservation.setLatitude(String.valueOf(latitude));
+                    duckObservation.setLongitude(String.valueOf(longitude));
+                    Long tsLong = System.currentTimeMillis()/1000;
+                    String ts = tsLong.toString();
+                    duckObservation.setTimestamp(ts);
+                    publishDuckObservation(duckObservation);
+                    return;
+                }
                     if ((mqttAndroidClient == null) && (mqtt_credentials_set)) {
                         // This case is the general case where the app already has the credentials stored
                         // for it and will just try to connect to the MQTT server.
@@ -386,11 +429,17 @@ public class MainActivity extends AppCompatActivity {
                         utils.getIOTPCredentials(getApplicationContext());
                     }
 
-                if (utils.isConnectedToDuckAP(context)) {
-                    // Not connected to the internet, try to connect to the duck!
-//                    Log.e(TAG, "Not connected to the internet, trying to connect to the duck!");
-                    //        utils.connectToDuckAP(getApplicationContext());       //TODO: OMER -> Only now for debug. Return it later!
-                }
+                    //TODO: OMER -> Not yet working!
+//                if (utils.isConnectedToDuckAP(context)) {
+//                    // Not connected to the internet, try to connect to the duck!
+////                    Log.e(TAG, "Not connected to the internet, trying to connect to the duck!");
+//                    //        utils.connectToDuckAP(getApplicationContext());       //TODO: OMER -> Only now for debug. Return it later!
+//                    checkDBBUtton.setEnabled(false);
+//
+//                }
+//                if (utils.isConnectedToInternet(context)) {
+//                    checkDBBUtton.setEnabled(true);
+//                }
 
 
 

@@ -34,6 +34,10 @@ public class Constants {
 
     private static List<String> messageIDs = new ArrayList<>();
 
+
+
+    private static String duckMacAddress = "";
+
     private static final String IOT_DEVICE_USERNAME  = "use-token-auth";
     private static final String publishTopic = "iot-2/evt/androidDebug/fmt/json";
 
@@ -48,6 +52,10 @@ public class Constants {
 
     private static String serverUri = "";
     private static final String duck_AP_IP = "http://192.168.1.1:80/";
+
+
+
+    private static final String duck_MAC_AP_IP = "http://192.168.1.1:80/id";
 
 
 
@@ -118,5 +126,17 @@ public class Constants {
 
     public static void addMessageID(String msgID) {
         Constants.messageIDs.add(msgID);
+    }
+
+    public static String getDuck_MAC_AP_IP() {
+        return duck_MAC_AP_IP;
+    }
+
+    public static String getDuckMacAddress() {
+        return duckMacAddress;
+    }
+
+    public static void setDuckMacAddress(String duckMacAddress) {
+        Constants.duckMacAddress = duckMacAddress;
     }
 }

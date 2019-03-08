@@ -12,10 +12,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
@@ -87,7 +90,7 @@ public class Utils {
             @Override
             public void onResponse(String response) {
                 //HANDLE RESPONSE
-                Log.e(TAG, "Response == " + response);
+//                Log.e(TAG, "Response == " + response);
                 if (response.contains("EMERGENCY")) {
                     Toast.makeText(context,"MSG was sent successfully!",Toast.LENGTH_SHORT).show();
                 }
@@ -115,7 +118,6 @@ public class Utils {
                 HashMap<String, String> hashMap = emergencyRequest.getMap();
                 return hashMap;
             }
-
         };
 //        commonRequest.setRetryPolicy(new DefaultRetryPolicy(5000, 1, 2));
         MySingleton.getInstance(context).addToRequestQueue(commonRequest);
@@ -331,6 +333,51 @@ public class Utils {
 
 //        Log.e(TAG,"This device MAC address: " + address);
         return address;
+    }
+
+    public void sendGetRequestDuckMACAddress(final Context context) {
+        String url = Constants.getDuck_MAC_AP_IP();
+
+        StringRequest commonRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //HANDLE RESPONSE
+                Log.e(TAG, "Response == " + response);
+                if (response != null) {
+                    Constants.setDuckMacAddress(response);
+                    Intent intent = new Intent();
+                    intent.setAction("DUCK_MACADRESS_UPDATED");      //TODO: OMER -> Register something else!
+                    intent.putExtra("data","Notice me senpai!");
+                    context.sendBroadcast(intent);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle your error types accordingly.For Timeout & No
+                // connection error, you can show 'retry' button.
+                // For AuthFailure, you can re login with user
+                // credentials.
+                // For ClientError, 400 & 401, Errors happening on
+                // client side when sending api request.
+                // In this case you can check how client is forming the
+                // api and debug accordingly.
+                // For ServerError 5xx, you can do retry or handle
+                // accordingly.
+//                Log.e(TAG, error.toString());
+                Toast.makeText(context," Not connected to a duck!", Toast.LENGTH_LONG).show();
+
+            }
+        });
+//        {
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//                HashMap<String, String> hashMap = emergencyRequest.getMap();
+//                return hashMap;
+//            }
+//        };
+//        commonRequest.setRetryPolicy(new DefaultRetryPolicy(5000, 1, 2));
+        MySingleton.getInstance(context).addToRequestQueue(commonRequest);
     }
 
 

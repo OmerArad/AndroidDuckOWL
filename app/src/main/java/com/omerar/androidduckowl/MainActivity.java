@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView connectedImage;
     TextView msgDebug;
     Button checkDBBUtton;
+    Button tagDuckButton;
 
 
     @Override
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         utils = new Utils();
         Context context = getApplicationContext();
         checkDBBUtton = findViewById(R.id.checkDB);
+        tagDuckButton = findViewById(R.id.tagDuck);
 
 
         sharedPref = context.getSharedPreferences(
@@ -384,6 +386,18 @@ public class MainActivity extends AppCompatActivity {
                 checkDuckConnectionStatus();
 
                 utils.getMACAddress();
+
+                if (utils.isConnectedToDuckAP(context)) {
+                    //        utils.connectToDuckAP(getApplicationContext());       //TODO: OMER -> Only now for debug. Return it later!
+                    checkDBBUtton.setClickable(false);
+                    tagDuckButton.setClickable(true);
+
+                }
+                if (utils.isConnectedToInternet(context)) {
+                    checkDBBUtton.setClickable(true);
+                    tagDuckButton.setClickable(false);
+                }
+
                 Boolean mqtt_credentials_set = sharedPref.getBoolean(getString(R.string.mqtt_credentials_set), Boolean.FALSE);
                     if ((intent.getAction() != null) && intent.getAction().equals("MQTT_CREDENTIALS_RECIEVED") && (mqttAndroidClient == null)) {
                         Log.e(TAG, "11111111111111");
@@ -428,21 +442,6 @@ public class MainActivity extends AppCompatActivity {
                         // the IOTP credentials for this specific Android device.
                         utils.getIOTPCredentials(getApplicationContext());
                     }
-
-                    //TODO: OMER -> Not yet working!
-//                if (utils.isConnectedToDuckAP(context)) {
-//                    // Not connected to the internet, try to connect to the duck!
-////                    Log.e(TAG, "Not connected to the internet, trying to connect to the duck!");
-//                    //        utils.connectToDuckAP(getApplicationContext());       //TODO: OMER -> Only now for debug. Return it later!
-//                    checkDBBUtton.setEnabled(false);
-//
-//                }
-//                if (utils.isConnectedToInternet(context)) {
-//                    checkDBBUtton.setEnabled(true);
-//                }
-
-
-
             } catch (NullPointerException e) {
                 e.printStackTrace();
             }

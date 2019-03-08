@@ -51,18 +51,18 @@ public class Utils {
 
 //            Log.e(TAG, "WiFi SSID: " + ssid);
             if (ssid == null) {
-                Toast.makeText(context, "Not connected to the correct Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
+//                Toast.makeText(context, "Not connected to the correct Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
                 return false;
             }
             if (!ssid.contains("EMERGENCY")) {
-                Toast.makeText(context, "Not connected to the correct Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
+//                Toast.makeText(context, "Not connected to the correct Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
                 return false;
             } else {
 //                Log.e(TAG, "GREAT SUCCESS! CONNECTED TO THE DUCK WIFI!");
                 return true;
             }
         } else if (info == null) {
-            Toast.makeText(context, "Not connected to the Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
+//            Toast.makeText(context, "Not connected to the Duck's Wifi! Please connect and try again", Toast.LENGTH_LONG).show();
         }
         return false;
     }

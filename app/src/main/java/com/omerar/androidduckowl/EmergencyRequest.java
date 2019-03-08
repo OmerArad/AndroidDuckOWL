@@ -50,6 +50,7 @@ public class EmergencyRequest {
             offline.msg        = webServer.arg(10);
          */
         hashMap.put("uuid",this.uuid);  // this is being ignored by the device, it has to be unique! id = webserver.arg(0)
+
         hashMap.put("name",this.name);
         hashMap.put("street",this.street);
         hashMap.put("phone",this.phone);
@@ -59,7 +60,7 @@ public class EmergencyRequest {
         hashMap.put("firstaid",this.firstaid);
         hashMap.put("water",this.water);
         hashMap.put("food",this.food);
-        hashMap.put("message",this.message);
+        hashMap.put("message","test !!!!");
 
         return hashMap;
     }

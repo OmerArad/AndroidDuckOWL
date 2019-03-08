@@ -340,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkDB(View view) {
+
         utils.sendPOSTRequestMSGStatus(getApplicationContext());
     }
 
@@ -478,12 +479,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void publishTestMessage() {
-        String counterSTR = "99";
-        EmergencyRequest emergencyRequest = new EmergencyRequest(counterSTR,"User" + counter,
-                counterSTR,counterSTR,counterSTR,counterSTR,
-                counterSTR,counterSTR,counterSTR,counterSTR,counterSTR);
-        publishMessage(emergencyRequest);
-    }
+
 
 }

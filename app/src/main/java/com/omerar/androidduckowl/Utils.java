@@ -87,7 +87,7 @@ public class Utils {
             @Override
             public void onResponse(String response) {
                 //HANDLE RESPONSE
-//                Log.e(TAG, "Response == " + response);
+                Log.e(TAG, "Response == " + response);
                 if (response.contains("EMERGENCY")) {
                     Toast.makeText(context,"MSG was sent successfully!",Toast.LENGTH_SHORT).show();
                 }
@@ -261,12 +261,13 @@ public class Utils {
                 Log.e(TAG, String.valueOf(response));
 
                 Log.e(TAG, response.toString());
-                Toast.makeText(context, response.toString(),Toast.LENGTH_LONG).show();     //TODO: OMER -> Change this!
+//                Toast.makeText(context, response.toString(),Toast.LENGTH_LONG).show();     //TODO: OMER -> Change this!
 
-//                    Intent intent = new Intent();
-//                    intent.setAction("MQTT_CREDENTIALS_RECIEVED");      //TODO: OMER -> Register something else!
-//                    intent.putExtra("data","Notice me senpai!");
-//                    context.sendBroadcast(intent);
+                    Intent intent = new Intent(context, ResultsActivity.class);
+                    intent.putExtra("TEST", response.toString());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                context.startActivity(intent);
 
             }
         }, new Response.ErrorListener() {

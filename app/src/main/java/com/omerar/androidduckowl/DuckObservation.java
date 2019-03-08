@@ -3,14 +3,14 @@ package com.omerar.androidduckowl;
 public class DuckObservation {
 //    "observation": {
 //        "timestamp": "2019-04-12 13:34",
-//                "device_type": "papa-duck",
+//                "deviceType": "papa-duck",
 //                "device_id":"dereks-duck",
 //                "latitude": "53.2324",
 //                "longitude": "-1.34343"
 //    }
 
     private String deviceType;
-    private String deviceId;
+    private String deviceID;
     private String latitude;
     private String longitude;
     private String timestamp;
@@ -23,12 +23,12 @@ public class DuckObservation {
         this.deviceType = deviceType;
     }
 
-    public String getDeviceId() {
-        return deviceId;
+    public String getDeviceID() {
+        return deviceID;
     }
 
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
+    public void setDeviceID(String device_id) {
+        this.deviceID = device_id;
     }
 
     public String getLatitude() {

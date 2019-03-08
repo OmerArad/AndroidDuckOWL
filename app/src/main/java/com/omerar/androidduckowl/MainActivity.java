@@ -312,7 +312,8 @@ public class MainActivity extends AppCompatActivity {
             String json = gson.toJson(duckObservation);
             message.setPayload(json.getBytes());
             message.setQos(1);
-            mqttAndroidClient.publish(Constants.getPublishTopicDuckObservation(), message);
+//            mqttAndroidClient.publish(Constants.getPublishTopicDuckObservation(), message);
+            mqttAndroidClient.publish(Constants.getPublishTopic(), message);
             Log.e(TAG, " Trying to publish Duck Observation: " + message);
             if(!mqttAndroidClient.isConnected()){
 //                Log.e(TAG,mqttAndroidClient.getBufferedMessageCount() + " messages in buffer.");
@@ -365,13 +366,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkDB(View view) {
-
-        utils.sendPOSTRequestMSGStatus(getApplicationContext());
+        if (utils.isConnectedToInternet(getApplicationContext())) {
+            utils.sendPOSTRequestMSGStatus(getApplicationContext());
+        } else {
+            Toast.makeText(getApplicationContext(),"Please connect the internet first!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void tagDuck(View view) {
-        // Create an API call that will tag the location of the duck and the duck's MAC ADDRESS!
-        utils.sendGetRequestDuckMACAddress(getApplicationContext());
+        if (utils.isConnectedToDuckAP(getApplicationContext())) {
+            utils.sendGetRequestDuckMACAddress(getApplicationContext());
+        } else {
+            Toast.makeText(getApplicationContext(),"Please connect to a duck first!", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -407,12 +414,13 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                 if ((intent.getAction() != null) && intent.getAction().equals("DUCK_MACADRESS_UPDATED") && (mqttAndroidClient != null)) {
-                    Log.e(TAG, "33333333333");
+                    Log.e(TAG, "444444444444");
+                    Log.e(TAG, "Trying to send the new GPS Coords for the Duck Observation!");
                     // This case is when we tagged a duck and we want to send the phone's GPS coordinates
                     // With the duck's Mac Address to the db.
                     msgDebug.setText("Duck MacAddress == " + Constants.getDuckMacAddress());
                     DuckObservation duckObservation = new DuckObservation();
-                    duckObservation.setDeviceId(Constants.getDuckMacAddress());
+                    duckObservation.setDeviceID(Constants.getDuckMacAddress());
                     duckObservation.setDeviceType("ducklink");
                     double latitude = lastKnownLocation.getLatitude();
                     double longitude = lastKnownLocation.getLongitude();
@@ -421,6 +429,7 @@ public class MainActivity extends AppCompatActivity {
                     Long tsLong = System.currentTimeMillis()/1000;
                     String ts = tsLong.toString();
                     duckObservation.setTimestamp(ts);
+                    Log.e(TAG, duckObservation.toString());
                     publishDuckObservation(duckObservation);
                     return;
                 }

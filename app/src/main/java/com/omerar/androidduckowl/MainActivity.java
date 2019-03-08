@@ -447,6 +447,10 @@ public class MainActivity extends AppCompatActivity {
                     if (lastKnownLocation != null) {
                         double latitude = lastKnownLocation.getLatitude();
                         double longitude = lastKnownLocation.getLongitude();
+                        if (latitude == 0) {
+                            Toast.makeText(context, "No GPS Location yet!", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         duckObservation.setLatitude(String.valueOf(latitude));
                         duckObservation.setLongitude(String.valueOf(longitude));
                     }

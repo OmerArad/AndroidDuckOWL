@@ -344,6 +344,7 @@ public class Utils {
                 //HANDLE RESPONSE
                 Log.e(TAG, "Response == " + response);
                 if (response != null) {
+                    Toast.makeText(context, "Sending a Duck Observation message to the queue!", Toast.LENGTH_SHORT).show();
                     Constants.setDuckMacAddress(response);
                     Intent intent = new Intent();
                     intent.setAction("DUCK_MACADRESS_UPDATED");

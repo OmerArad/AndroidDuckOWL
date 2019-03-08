@@ -108,7 +108,7 @@ public class Utils {
                 // api and debug accordingly.
                 // For ServerError 5xx, you can do retry or handle
                 // accordingly.
-//                Log.e(TAG, error.toString());
+                Log.e(TAG, error.toString());
                 Toast.makeText(context,"Please Put your phone on Airplane mode!", Toast.LENGTH_LONG).show();
 
             }
@@ -380,6 +380,8 @@ public class Utils {
 //        commonRequest.setRetryPolicy(new DefaultRetryPolicy(5000, 1, 2));
         MySingleton.getInstance(context).addToRequestQueue(commonRequest);
     }
+
+
 
 
 }

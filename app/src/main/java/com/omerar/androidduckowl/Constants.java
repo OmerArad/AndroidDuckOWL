@@ -1,5 +1,7 @@
 package com.omerar.androidduckowl;
 
+import android.location.Location;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +39,11 @@ public class Constants {
 
 
     private static String duckMacAddress = "";
+
+
+
+    private static Location duckLastLocation;
+
 
     private static final String IOT_DEVICE_USERNAME  = "use-token-auth";
     private static final String publishTopic = "iot-2/evt/androidDebug/fmt/json";
@@ -146,5 +153,13 @@ public class Constants {
 
     public static String getPublishTopicDuckObservation() {
         return publishTopicDuckObservation;
+    }
+
+    public static Location getDuckLastLocation() {
+        return duckLastLocation;
+    }
+
+    public static void setDuckLastLocation(Location duckLastLocation) {
+        Constants.duckLastLocation = duckLastLocation;
     }
 }

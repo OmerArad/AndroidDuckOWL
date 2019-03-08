@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     Location lastKnownLocation;
     TextView duckConnectionTextView;
     TextView mqttConnectionTextView;
+    TextView locationTextView;
     ImageView connectedImage;
     TextView msgDebug;
     Button checkDBBUtton;
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         Context context = getApplicationContext();
         checkDBBUtton = findViewById(R.id.checkDB);
         tagDuckButton = findViewById(R.id.tagDuck);
-
+        locationTextView = findViewById(R.id.location_textview);
 
         sharedPref = context.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -141,6 +142,21 @@ public class MainActivity extends AppCompatActivity {
 //                makeUseOfNewLocation(location);
                 lastKnownLocation = location;
                 Log.d(TAG, "Location == " + location.toString());
+                if (Constants.getDuckLastLocation() != null) {
+                    float distance = lastKnownLocation.distanceTo(Constants.getDuckLastLocation());
+                    String distanceString = "Distance: " + String.valueOf(distance);
+                    try {
+                        TextView textView = findViewById(R.id.location_textview);
+                        textView.setText(distanceString);
+                        Log.e(TAG, "Trying to change distance: " + distanceString);
+
+
+                    } catch (Exception exception) {
+                        Log.e(TAG, exception.toString());
+                    }
+
+                }
+
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -154,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
         };
 
 
+
 // Register the listener with the Location Manager to receive location updates
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -162,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
     }
+
 
     void initializeMQTT() {
         mqttAndroidClient = new MqttAndroidClient(getApplicationContext(), Constants.getServerUri(), Constants.getClientId());
@@ -378,6 +396,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void tagDuck(View view) {
         if (utils.isConnectedToDuckAP(getApplicationContext())) {
+            Constants.setDuckLastLocation(lastKnownLocation);
             utils.sendGetRequestDuckMACAddress(getApplicationContext());
         } else {
             Toast.makeText(getApplicationContext(),"Please connect to a duck first!", Toast.LENGTH_SHORT).show();
@@ -425,10 +444,12 @@ public class MainActivity extends AppCompatActivity {
                     DuckObservation duckObservation = new DuckObservation();
                     duckObservation.setDeviceID(Constants.getDuckMacAddress());
                     duckObservation.setDeviceType("ducklink");
-                    double latitude = lastKnownLocation.getLatitude();
-                    double longitude = lastKnownLocation.getLongitude();
-                    duckObservation.setLatitude(String.valueOf(latitude));
-                    duckObservation.setLongitude(String.valueOf(longitude));
+                    if (lastKnownLocation != null) {
+                        double latitude = lastKnownLocation.getLatitude();
+                        double longitude = lastKnownLocation.getLongitude();
+                        duckObservation.setLatitude(String.valueOf(latitude));
+                        duckObservation.setLongitude(String.valueOf(longitude));
+                    }
                     Long tsLong = System.currentTimeMillis();
                     String ts = tsLong.toString();
                     duckObservation.setTimestamp(ts);

@@ -42,6 +42,10 @@ public class Constants {
     private static final String publishTopic = "iot-2/evt/androidDebug/fmt/json";
 
 
+
+    private static final String publishTopicDuckObservation = "iot-2/evt/device-observation/fmt/json";
+
+
     private static final String subscriptionTopic = "iot-2/cmd/+/fmt/json";
     private static String clientID = "";
 //    Organization ID: zoad0c
@@ -138,5 +142,9 @@ public class Constants {
 
     public static void setDuckMacAddress(String duckMacAddress) {
         Constants.duckMacAddress = duckMacAddress;
+    }
+
+    public static String getPublishTopicDuckObservation() {
+        return publishTopicDuckObservation;
     }
 }

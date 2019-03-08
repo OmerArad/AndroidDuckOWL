@@ -312,7 +312,7 @@ public class MainActivity extends AppCompatActivity {
             String json = gson.toJson(duckObservation);
             message.setPayload(json.getBytes());
             message.setQos(1);
-            mqttAndroidClient.publish(Constants.getPublishTopic(), message);
+            mqttAndroidClient.publish(Constants.getPublishTopicDuckObservation(), message);
             Log.e(TAG, " Trying to publish Duck Observation: " + message);
             if(!mqttAndroidClient.isConnected()){
 //                Log.e(TAG,mqttAndroidClient.getBufferedMessageCount() + " messages in buffer.");

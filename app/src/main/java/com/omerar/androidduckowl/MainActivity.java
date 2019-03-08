@@ -312,8 +312,7 @@ public class MainActivity extends AppCompatActivity {
             String json = gson.toJson(duckObservation);
             message.setPayload(json.getBytes());
             message.setQos(1);
-//            mqttAndroidClient.publish(Constants.getPublishTopicDuckObservation(), message);
-            mqttAndroidClient.publish(Constants.getPublishTopic(), message);
+            mqttAndroidClient.publish(Constants.getPublishTopicDuckObservation(), message);
             Log.e(TAG, " Trying to publish Duck Observation: " + message);
             if(!mqttAndroidClient.isConnected()){
 //                Log.e(TAG,mqttAndroidClient.getBufferedMessageCount() + " messages in buffer.");
@@ -350,6 +349,8 @@ public class MainActivity extends AppCompatActivity {
             publishMessage(emergencyRequest);
             Log.e(TAG, "Trying to send SOS MSG!");
             Constants.addMessageID(uniqueId);
+        } else {
+            Toast.makeText(getApplicationContext(),"Please connect to a duck first!", Toast.LENGTH_SHORT).show();
         }
 
 
@@ -362,6 +363,8 @@ public class MainActivity extends AppCompatActivity {
             for (int i=0; i<10; i++) {
                 sendSOSAutomaticMessage(view);
             }
+        } else {
+            Toast.makeText(getApplicationContext(),"Please connect to a duck first!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -426,7 +429,7 @@ public class MainActivity extends AppCompatActivity {
                     double longitude = lastKnownLocation.getLongitude();
                     duckObservation.setLatitude(String.valueOf(latitude));
                     duckObservation.setLongitude(String.valueOf(longitude));
-                    Long tsLong = System.currentTimeMillis()/1000;
+                    Long tsLong = System.currentTimeMillis();
                     String ts = tsLong.toString();
                     duckObservation.setTimestamp(ts);
                     Log.e(TAG, duckObservation.toString());

@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkDuckConnectionStatus() {
         if (utils.isConnectedToDuckAP(getApplicationContext())) {
-            //TODO: OMER -> Check the edge case that it is connected to the duck and the mobile network!!!!!!!
             duckConnectionTextView.setText(R.string.duck_connected);
             duckConnectionTextView.setTextColor(Color.GREEN);
             connectedImage.setImageDrawable(getResources().getDrawable(R.drawable.connected_duck));
@@ -452,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
                 utils.getMACAddress();
 
                 if (utils.isConnectedToDuckAP(context)) {
-                    //        utils.connectToDuckAP(getApplicationContext());       //TODO: OMER -> Only now for debug. Return it later!
+                    //        utils.connectToDuckAP(getApplicationContext());       //Should not always be created!
                     checkDBBUtton.setClickable(false);
                     tagDuckButton.setClickable(true);
 

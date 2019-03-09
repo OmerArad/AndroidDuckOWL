@@ -276,14 +276,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void subscribeToTopic(){
-        //TODO: Currently not working!
         try {
 
             mqttAndroidClient.subscribe(Constants.getSubscriptionTopic(), 0, getApplicationContext(), new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.e(TAG,"Subscribed!");
-//                    publishMessage();   //TODO: Send a connected msg!
+//                    publishMessage();   // Send a connected msg!
 
 
                 }
@@ -464,7 +463,7 @@ public class MainActivity extends AppCompatActivity {
                     tagDuckButton.setClickable(false);
                 }
 
-                Boolean mqtt_credentials_set = sharedPref.getBoolean(getString(R.string.mqtt_credentials_set), Boolean.FALSE);
+                boolean mqtt_credentials_set = sharedPref.getBoolean(getString(R.string.mqtt_credentials_set), Boolean.FALSE);
                     if ((intent.getAction() != null) && intent.getAction().equals("MQTT_CREDENTIALS_RECIEVED") && (mqttAndroidClient == null)) {
                         Log.e(TAG, "11111111111111");
                         // This case is where the API Call returned the MQTT credentials. Now it should

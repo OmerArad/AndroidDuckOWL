@@ -14,6 +14,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -371,7 +372,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Please connect to a duck first!", Toast.LENGTH_SHORT).show();
         }
 
-
     }
 
     public void sendManySOSMSGS(View view) {
@@ -380,6 +380,12 @@ public class MainActivity extends AppCompatActivity {
         if (isConnected) {
             for (int i=0; i<10; i++) {
                 sendSOSAutomaticMessage(view);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
             }
         } else {
             Toast.makeText(getApplicationContext(),"Please connect to a duck first!", Toast.LENGTH_SHORT).show();

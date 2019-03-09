@@ -53,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
     Utils utils;
     BroadcastReceiver mNetworkReceiver;
 
+    LocationManager locationManager;
+    LocationListener locationListener;
+
     String localClientId;
     MqttConnectOptions mqttConnectOptions;
 
@@ -136,10 +139,10 @@ public class MainActivity extends AppCompatActivity {
 
     void getLocation() {
         // Acquire a reference to the system Location Manager
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         // Define a listener that responds to location updates
-        LocationListener locationListener = new LocationListener() {
+        locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
 //                makeUseOfNewLocation(location);
@@ -583,7 +586,7 @@ public class MainActivity extends AppCompatActivity {
                             == PackageManager.PERMISSION_GRANTED) {
 
                         //Request location updates:
-//                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
                     }
 
                 } else {

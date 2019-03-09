@@ -19,9 +19,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     TextView msgDebug;
     Button checkDBBUtton;
     Button tagDuckButton;
+    String m_Text = "";
 
 
     @Override
@@ -394,7 +397,34 @@ public class MainActivity extends AppCompatActivity {
 
     public void checkDB(View view) {
         if (utils.isConnectedToInternet(getApplicationContext())) {
-            utils.sendPOSTRequestMSGStatus(getApplicationContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Write a description for the test!");
+
+
+            final EditText input = new EditText(this);
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+
+            // Set up the buttons
+            builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    m_Text = input.getText().toString();
+                    utils.sendPOSTRequestMSGStatus(getApplicationContext(), m_Text);
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+
+
+
         } else {
             Toast.makeText(getApplicationContext(),"Please connect the internet first!", Toast.LENGTH_SHORT).show();
         }

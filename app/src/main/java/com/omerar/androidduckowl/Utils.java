@@ -237,7 +237,7 @@ public class Utils {
     }
 
 
-    public void sendPOSTRequestMSGStatus(final Context context) {
+    public void sendPOSTRequestMSGStatus(final Context context, String description) {
         String url = "https://ducks-to-db.mybluemix.net/api/devices/message_status";
 
         JSONObject jsonBodyObj = new JSONObject();
@@ -251,6 +251,7 @@ public class Utils {
             }
 
             jsonBodyObj.put("message_ids", msgs);
+            jsonBodyObj.put("name", description);
         }catch (JSONException e){
             e.printStackTrace();
         }

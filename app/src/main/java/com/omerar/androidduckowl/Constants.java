@@ -63,10 +63,14 @@ public class Constants {
 
     private static String serverUri = "";
     private static final String duck_AP_IP = "http://192.168.1.1:80/";
-
-
-
     private static final String duck_MAC_AP_IP = "http://192.168.1.1:80/id";
+
+    private static final String DUCK_API_GET_DEVICE_CREDENTIALS = "https://ducks-to-db.mybluemix.net/api/devices";
+
+
+
+    private static final String DUCK_API_GET_MESSAGES_STATUS = "https://ducks-to-db.mybluemix.net/api/devices/message_status";
+
 
 
 
@@ -161,5 +165,12 @@ public class Constants {
 
     public static void setDuckLastLocation(Location duckLastLocation) {
         Constants.duckLastLocation = duckLastLocation;
+    }
+
+    public static String getDuckApiGetDeviceCredentials() {
+        return DUCK_API_GET_DEVICE_CREDENTIALS;
+    }
+    public static String getDuckApiGetMessagesStatus() {
+        return DUCK_API_GET_MESSAGES_STATUS;
     }
 }

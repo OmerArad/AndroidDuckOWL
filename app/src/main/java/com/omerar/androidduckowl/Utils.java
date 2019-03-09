@@ -40,8 +40,6 @@ public class Utils {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
 
-
-
         if (info != null && info.isConnected()) {
             WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
@@ -109,7 +107,7 @@ public class Utils {
                 // For ServerError 5xx, you can do retry or handle
                 // accordingly.
                 Log.e(TAG, error.toString());
-                Toast.makeText(context,"Please Put your phone on Airplane mode!", Toast.LENGTH_LONG).show();
+                Toast.makeText(context,"Got an error from the HTTP Request! Is your phone on Airplane Mode?", Toast.LENGTH_LONG).show();
 
             }
         }) {
@@ -119,7 +117,6 @@ public class Utils {
                 return hashMap;
             }
         };
-//        commonRequest.setRetryPolicy(new DefaultRetryPolicy(5000, 1, 2));
         MySingleton.getInstance(context).addToRequestQueue(commonRequest);
     }
 
@@ -149,7 +146,7 @@ public class Utils {
     }
 
     private void sendPOSTRequestCredentials(final Context context) {
-        String url = "https://ducks-to-db.mybluemix.net/api/devices";
+        String url = Constants.getDuckApiGetDeviceCredentials();
 
         JSONObject jsonBodyObj = new JSONObject();
 
@@ -238,7 +235,7 @@ public class Utils {
 
 
     public void sendPOSTRequestMSGStatus(final Context context, String description) {
-        String url = "https://ducks-to-db.mybluemix.net/api/devices/message_status";
+        String url = Constants.getDuckApiGetMessagesStatus();
 
         JSONObject jsonBodyObj = new JSONObject();
 
@@ -330,9 +327,8 @@ public class Utils {
                 address = buf.toString();
             }
         } catch (Exception ex) { } // for now eat exceptions
-
-
 //        Log.e(TAG,"This device MAC address: " + address);
+
         return address;
     }
 
@@ -371,14 +367,6 @@ public class Utils {
 
             }
         });
-//        {
-//            @Override
-//            protected Map<String, String> getParams() throws AuthFailureError {
-//                HashMap<String, String> hashMap = emergencyRequest.getMap();
-//                return hashMap;
-//            }
-//        };
-//        commonRequest.setRetryPolicy(new DefaultRetryPolicy(5000, 1, 2));
         MySingleton.getInstance(context).addToRequestQueue(commonRequest);
     }
 

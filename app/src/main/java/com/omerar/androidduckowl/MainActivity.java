@@ -480,7 +480,7 @@ public class MainActivity extends AppCompatActivity {
                     msgDebug.setText("Duck MacAddress == " + Constants.getDuckMacAddress());
                     DuckObservation duckObservation = new DuckObservation();
                     duckObservation.setDeviceID(Constants.getDuckMacAddress());
-                    duckObservation.setDeviceType("ducklink");
+                    duckObservation.setDeviceType(Constants.getDuckType());
                     if (lastKnownLocation != null) {
                         double latitude = lastKnownLocation.getLatitude();
                         double longitude = lastKnownLocation.getLongitude();

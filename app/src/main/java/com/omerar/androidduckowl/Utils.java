@@ -342,7 +342,12 @@ public class Utils {
                 Log.e(TAG, "Response == " + response);
                 if (response != null) {
                     Toast.makeText(context, "Sending a Duck Observation message to the queue!", Toast.LENGTH_SHORT).show();
-                    Constants.setDuckMacAddress(response);
+                    String[] responseArray = response.split(",") ;
+                    String duckMac =  responseArray[0];
+                    String duckType = responseArray[1];
+                    Log.e(TAG, "duckMac == " + duckMac + " , duckType == " + duckType);
+                    Constants.setDuckMacAddress(duckMac);
+                    Constants.setDuckType(duckType);
                     Intent intent = new Intent();
                     intent.setAction("DUCK_MACADRESS_UPDATED");
 //                    intent.putExtra("data","Notice me senpai!");

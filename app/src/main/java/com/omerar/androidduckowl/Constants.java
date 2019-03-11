@@ -29,6 +29,10 @@ public class Constants {
     private static List<String> messageIDs = new ArrayList<>();
 
     private static String duckMacAddress = "";
+
+
+
+    private static String duckType = "";
     private static Location duckLastLocation;
 
     private static final String IOT_DEVICE_USERNAME  = "use-token-auth";
@@ -143,5 +147,12 @@ public class Constants {
     }
     public static String getDuckApiGetMessagesStatus() {
         return DUCK_API_GET_MESSAGES_STATUS;
+    }
+    public static String getDuckType() {
+        return duckType;
+    }
+
+    public static void setDuckType(String duckType) {
+        Constants.duckType = duckType;
     }
 }

@@ -465,7 +465,6 @@ public class MainActivity extends AppCompatActivity {
 
                 boolean mqtt_credentials_set = sharedPref.getBoolean(getString(R.string.mqtt_credentials_set), Boolean.FALSE);
                     if ((intent.getAction() != null) && intent.getAction().equals("MQTT_CREDENTIALS_RECIEVED") && (mqttAndroidClient == null)) {
-                        Log.e(TAG, "11111111111111");
                         // This case is where the API Call returned the MQTT credentials. Now it should
                         // initialize the MQTT server and will connect to it.
                         Log.d(TAG, "MQTT Credentials set");
@@ -473,7 +472,6 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                 if ((intent.getAction() != null) && intent.getAction().equals("DUCK_MACADRESS_UPDATED") && (mqttAndroidClient != null)) {
-                    Log.e(TAG, "444444444444");
                     Log.e(TAG, "Trying to send the new GPS Coords for the Duck Observation!");
                     // This case is when we tagged a duck and we want to send the phone's GPS coordinates
                     // With the duck's Mac Address to the db.
@@ -501,7 +499,6 @@ public class MainActivity extends AppCompatActivity {
                     if ((mqttAndroidClient == null) && (mqtt_credentials_set)) {
                         // This case is the general case where the app already has the credentials stored
                         // for it and will just try to connect to the MQTT server.
-                        Log.e(TAG, "22222222222222");
                         Constants.setOrganization(sharedPref.getString(getString(R.string.organization), ""));
                         Constants.setDeviceType(sharedPref.getString(getString(R.string.deviceType), ""));
                         Constants.setDeviceID(sharedPref.getString(getString(R.string.deviceID), ""));
@@ -510,7 +507,6 @@ public class MainActivity extends AppCompatActivity {
                                 " , deviceID=" + Constants.getDeviceID() + " ,authToken=" + Constants.getAuthToken());
                         initializeMQTT();
                     } else if (!mqtt_credentials_set){
-                        Log.e(TAG, "333333333333333");
                         // This is the first time the app opens. Need to go to the API and ask for
                         // the IOTP credentials for this specific Android device.
                         utils.getIOTPCredentials(getApplicationContext());

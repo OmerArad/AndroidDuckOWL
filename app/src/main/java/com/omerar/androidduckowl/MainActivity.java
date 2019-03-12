@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
                 TextView locationTextView = findViewById(R.id.location_textview);
                 String locationText = location.getLatitude() + " , " + location.getLongitude();
                 locationTextView.setText(locationText);
-                //TODO: OMER -> Set up LocatinTextView here@@$^$@^@$^@^@$^@$^@
                 if (Constants.getDuckLastLocation() != null) {
                     float distance = lastKnownLocation.distanceTo(Constants.getDuckLastLocation());
                     String distanceString = "Distance: " + String.valueOf(distance);

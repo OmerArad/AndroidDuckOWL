@@ -14,6 +14,7 @@
     <string name="deviceID">deviceID</string>
     <string name="authToken">authToken</string>
     <string name="deviceType">deviceType</string>
+    <string name="distance_waiting_for_gps">Distance: Waiting for GPS</string>
     <string name="waiting_for_gps">Waiting for GPS</string>
 
 </resources>

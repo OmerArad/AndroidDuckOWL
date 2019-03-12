@@ -14,7 +14,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -64,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     Location lastKnownLocation;
     TextView duckConnectionTextView;
     TextView mqttConnectionTextView;
+    TextView distanceLocationTextView;
     TextView locationTextView;
     ImageView connectedImage;
     TextView msgDebug;
@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         Context context = getApplicationContext();
         checkDBBUtton = findViewById(R.id.checkDB);
         tagDuckButton = findViewById(R.id.tagDuck);
+        distanceLocationTextView = findViewById(R.id.distance_location_textview);
         locationTextView = findViewById(R.id.location_textview);
 
         sharedPref = context.getSharedPreferences(
@@ -148,15 +149,17 @@ public class MainActivity extends AppCompatActivity {
 //                makeUseOfNewLocation(location);
                 lastKnownLocation = location;
                 Log.d(TAG, "Location == " + location.toString());
+                TextView locationTextView = findViewById(R.id.location_textview);
+                String locationText = location.getLatitude() + " , " + location.getLongitude();
+                locationTextView.setText(locationText);
+                //TODO: OMER -> Set up LocatinTextView here@@$^$@^@$^@^@$^@$^@
                 if (Constants.getDuckLastLocation() != null) {
                     float distance = lastKnownLocation.distanceTo(Constants.getDuckLastLocation());
                     String distanceString = "Distance: " + String.valueOf(distance);
                     try {
-                        TextView textView = findViewById(R.id.location_textview);
+                        TextView textView = findViewById(R.id.distance_location_textview);
                         textView.setText(distanceString);
                         Log.e(TAG, "Trying to change distance: " + distanceString);
-
-
                     } catch (Exception exception) {
                         Log.e(TAG, exception.toString());
                     }

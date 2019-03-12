@@ -476,6 +476,7 @@ public class MainActivity extends AppCompatActivity {
                     // This case is when we tagged a duck and we want to send the phone's GPS coordinates
                     // With the duck's Mac Address to the db.
                     msgDebug.setText("Duck MacAddress == " + Constants.getDuckMacAddress());
+                    duckConnectionTextView.setText(duckConnectionTextView.getText() + " - " + Constants.getDuckMacAddress());
                     DuckObservation duckObservation = new DuckObservation();
                     duckObservation.setDeviceID(Constants.getDuckMacAddress());
                     duckObservation.setDeviceType(Constants.getDuckType());

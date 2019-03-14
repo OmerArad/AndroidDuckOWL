@@ -15,12 +15,6 @@ public class Constants {
 //    private static final String publishTopic = "iot-2/evt/test/fmt/json";
 //    private static final String clientID = "d:" + organization + ":" + deviceType + ":" + deviceID;
 
-    // OWL IOTP //
-//    private static  String organization = "zoad0c";
-//    private static  String deviceID = "omer-android-app";
-//    private static  String authToken = "kU7sJww216BA+RZ)If";
-//    private static  String deviceType  = "android";
-
     private static String organization = "";
     private static String deviceID = "";
     private static String authToken = "";
